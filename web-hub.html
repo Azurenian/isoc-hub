@@ -5,7 +5,15 @@
 
 <div id="hub-section" class="section" style="display: none;">
   <div class="container-fluid py-4">
-    <h1>This is Hub</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1>This is Hub</h1>
+      <div>
+        <button class="btn btn-success me-2" title="Add"><span role="img" aria-label="Add">🟢</span> Add</button>
+        <button class="btn btn-warning me-2" title="Edit"><span role="img" aria-label="Edit">🟡</span> Edit</button>
+        <button class="btn btn-danger me-2" title="Delete"><span role="img" aria-label="Delete">🔴</span> Delete</button>
+        <button class="btn btn-info" title="Refresh"><span role="img" aria-label="Refresh">🔄</span> Refresh</button>
+      </div>
+    </div>
     <div id="cards-container" class="row"></div>
   </div>
 </div>
@@ -14,12 +22,12 @@
 // Example spreadsheet data (replace with your actual data source)
 const spreadsheetData = [
   {
-    name: "App One",
+    name: "QTR App",
     description: "Description for App One.",
     link: "https://example.com/app-one"
   },
   {
-    name: "App Two",
+    name: "Ticketing System",
     description: "Description for App Two.",
     link: "https://example.com/app-two"
   },

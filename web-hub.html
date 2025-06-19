@@ -6,5 +6,45 @@
 <div id="hub-section" class="section" style="display: none;">
   <div class="container-fluid py-4">
     <h1>This is Hub</h1>
+    <div id="cards-container" class="row"></div>
   </div>
 </div>
+
+<script>
+// Example spreadsheet data (replace with your actual data source)
+const spreadsheetData = [
+  {
+    name: "App One",
+    description: "Description for App One.",
+    link: "https://example.com/app-one"
+  },
+  {
+    name: "App Two",
+    description: "Description for App Two.",
+    link: "https://example.com/app-two"
+  }
+];
+
+// Function to render cards
+function renderCards(data) {
+  const container = document.getElementById('cards-container');
+  container.innerHTML = '';
+  data.forEach(app => {
+    const card = document.createElement('div');
+    card.className = 'col-md-4 mb-3';
+    card.innerHTML = `
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">${app.name}</h5>
+          <p class="card-text">${app.description}</p>
+          <a href="${app.link}" class="btn btn-primary" target="_blank">Open App</a>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// Call the function with your data
+renderCards(spreadsheetData);
+</script>

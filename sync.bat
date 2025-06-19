@@ -12,7 +12,7 @@ if %errorlevel% neq 0 (
 echo [2/2] Pushing to Google Apps Script using Clasp...
 
 :: Temporarily override CLASPRC to use local copy
-set "CLASPRC=%~dp0.clasp\.clasprc.json"
+
 
 clasp push
 

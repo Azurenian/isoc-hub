@@ -1,0 +1,244 @@
+<!--
+  style-sidebar.html
+  Purpose: Contains CSS styles for the sidebar navigation and main layout structure.
+-->
+
+<style>
+  body {
+    overflow: hidden;
+    font-family: "Inter", sans-serif; /* Use Inter font globally */
+    background: #f8f9fa !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  .sidebar {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: #ffffff; /* Explicit light mode background */
+    color: #212529;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2rem;
+    z-index: 1000;
+    transition: background-color 0.3s ease, color 0.3s ease,
+      border-color 0.3s ease;
+  }
+  .sidebar .logo {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  .sidebar .logo img {
+    transition: opacity 0.3s ease;
+  }
+  .sidebar .title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+  }
+  .sidebar .nav-link {
+    color: #495057 !important;
+    font-size: 0.97rem;
+    border-radius: 0.75rem;
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+    transition: background 0.2s, color 0.2s;
+  }
+  .sidebar .nav-link.active,
+  .sidebar .nav-link:hover {
+    background: #26348d !important;
+    color: #fff !important;
+    border-radius: 0.75rem !important;
+    font-weight: 500;
+  }
+  /* Sidebar horizontal line style for light mode */
+  .sidebar hr {
+    border-top: 1.5px solid #e5e7eb;
+    opacity: 1;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    transition: border-color 0.3s ease;
+  }
+  .main-content {
+    margin-left: 250px;
+    height: 100vh;
+    overflow-y: auto;
+    transition: background-color 0.3s ease;
+  }
+  .section {
+    min-height: 100vh;
+    background-color: #f8f9fa; /* Light mode default background */
+    transition: background-color 0.3s ease;
+  }
+
+  /* ====== DARK MODE STYLES ====== */
+  /* Apply dark mode styles when the .dark-mode class is added to body */
+  body.dark-mode {
+    background: #030e21 !important;
+    color: #e1e7ef;
+  }
+
+  /* Dark mode section backgrounds */
+  body.dark-mode .section {
+    background-color: #030e21;
+  }
+
+  /* Sidebar Dark Mode - with higher specificity to override Bootstrap's bg classes */
+  body.dark-mode .sidebar {
+    background: #051529 !important;
+    color: #e1e7ef;
+    border-right-color: #0d2444 !important;
+  }
+
+  body.dark-mode .sidebar .nav-link {
+    color: #ffffff !important; /* Changed to white text in normal state */
+  }
+
+  body.dark-mode .sidebar hr {
+    border-top: 1.5px solid #172a45;
+  }
+
+  /* Inverted colors for sidebar nav links in dark mode */
+  body.dark-mode .sidebar .nav-link.active,
+  body.dark-mode .sidebar .nav-link:hover {
+    background: #ffffff !important; /* White background */
+    color: #26348d !important; /* Blue text when active/hovered */
+    border-radius: 0.75rem !important;
+    font-weight: 500;
+  }
+
+  /* Content area Dark Mode */
+  body.dark-mode .main-content {
+    background-color: #030e21;
+  }
+
+  /* Cards Dark Mode */
+  body.dark-mode .card {
+    background-color: #051529;
+    border-color: #0d2444;
+  }
+
+  body.dark-mode .card-body {
+    background-color: #051529;
+    color: #e1e7ef;
+  }
+
+  body.dark-mode .card-title {
+    color: #e1e7ef;
+  }
+
+  /* Tables Dark Mode */
+  body.dark-mode .table {
+    color: #e1e7ef;
+    border-color: #172a45;
+  }
+
+  body.dark-mode .table-bordered {
+    border-color: #172a45;
+  }
+
+  body.dark-mode .table-bordered td,
+  body.dark-mode .table-bordered th {
+    border-color: #172a45;
+  }
+
+  body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: #0a1e30;
+    color: #e1e7ef;
+  }
+
+  body.dark-mode .table-striped > tbody > tr:nth-of-type(even) > * {
+    background-color: #051529;
+  }
+
+  body.dark-mode .table-hover tbody tr:hover,
+  body.dark-mode .table-hover tbody tr:hover td {
+    background-color: #0d2444;
+    color: #ffffff;
+  }
+
+  body.dark-mode .table-light,
+  body.dark-mode .table thead th {
+    background-color: #0d2444 !important;
+    color: #e1e7ef;
+    border-color: #172a45;
+  }
+
+  /* Form elements Dark Mode */
+  body.dark-mode .form-control,
+  body.dark-mode .form-select {
+    background-color: #051529;
+    border-color: #172a45;
+    color: #e1e7ef;
+  }
+
+  /* Disabled form controls in dark mode */
+  body.dark-mode .form-control:disabled,
+  body.dark-mode .form-control[readonly] {
+    background-color: #0d2444 !important;
+    color: #8896b3;
+    border-color: #172a45;
+  }
+
+  body.dark-mode .form-control:focus,
+  body.dark-mode .form-select:focus {
+    background-color: #0a1e30;
+    border-color: #3b82f6;
+    color: #ffffff;
+  }
+
+  body.dark-mode .form-control::placeholder {
+    color: #8896b3;
+  }
+
+  body.dark-mode .input-group-text {
+    background-color: #0d2444;
+    border-color: #172a45;
+    color: #e1e7ef;
+  }
+
+  /* Buttons Dark Mode */
+  body.dark-mode .btn-outline-secondary {
+    color: #a8b3cf;
+    border-color: #172a45;
+  }
+
+  body.dark-mode .btn-outline-secondary:hover {
+    background-color: #0d2444;
+    color: #ffffff;
+  }
+
+  /* Modal Dark Mode */
+  body.dark-mode .modal-content {
+    background-color: #051529;
+    border-color: #172a45;
+  }
+
+  body.dark-mode .modal-header {
+    border-color: #172a45;
+  }
+
+  body.dark-mode .modal-footer {
+    border-color: #172a45;
+  }
+
+  /* Override text-secondary in dark mode */
+  body.dark-mode .text-secondary {
+    color: #a8b3cf !important;
+  }
+
+  body.dark-mode .text-muted {
+    color: #8896b3 !important;
+  }
+
+  /* Transitions for smoother dark/light mode switching */
+  .card,
+  .modal-content,
+  .form-control,
+  .btn {
+    transition: background-color 0.3s ease, color 0.3s ease,
+      border-color 0.3s ease;
+  }
+</style>

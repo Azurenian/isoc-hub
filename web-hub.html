@@ -66,7 +66,7 @@
 
 <script>
 // Example spreadsheet data (replace with your actual data source)
-const spreadsheetData = [
+let spreadsheetData = [
   {
     name: "QTR App",
     description: "Description for App One.",
@@ -153,5 +153,12 @@ document.getElementById('appForm').addEventListener('submit', function(e) {
   }
   renderCards(spreadsheetData);
   appModal.hide();
+});
+
+// Make the Refresh button functional
+document.querySelector('.btn-info[title="Refresh"]').addEventListener('click', function() {
+  // If you fetch from a backend, call your fetch function here.
+  // For now, just re-render the cards from the current spreadsheetData.
+  renderCards(spreadsheetData);
 });
 </script>

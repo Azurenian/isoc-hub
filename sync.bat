@@ -1,25 +1,17 @@
 @echo off
 setlocal
 
-echo [1/2] Pulling from GitHub...
-git pull
+echo [1] Pulling from GitHub...
+git pull || exit /b
 
-if %errorlevel% neq 0 (
-    echo Git pull failed.
-    exit /b %errorlevel%
-)
+echo [2] Pushing code to Apps Script...
+clasp push || exit /b
 
-echo [2/2] Pushing to Google Apps Script using Clasp...
+echo [3] Creating new project version...
+clasp version "Sync %DATE% %TIME%" || exit /b
 
-:: Temporarily override CLASPRC to use local copy
+echo [4] Redeploying version to existing deployment...
+clasp redeploy AKfycbzh9oljDWjhmmIGy00DuOFzAp0041kITSxfub-BIqem4eEnixzB6wv5QeFB0szt2rrv --versionNumber LATEST --description "Auto-sync" || exit /b
 
-
-clasp push
-
-if %errorlevel% neq 0 (
-    echo Clasp push failed.
-    exit /b %errorlevel%
-)
-
-echo ✅ Sync completed successfully.
+echo ✅ Full sync + deploy complete!
 pause

@@ -93,7 +93,7 @@ function renderCards(data) {
     card.className = 'col-md-4 mb-3';
     card.innerHTML = `
       <div class="card h-100 shadow-sm border-0">
-        <div class="card-body">
+        <div class="card-body" style="min-height: 260px;">
           <h5 class="card-title fw-semibold">${app.name}</h5>
           <p class="card-text">${app.description}</p>
           <a href="${app.link}" class="btn btn-outline-primary w-100" target="_blank">

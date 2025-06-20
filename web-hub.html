@@ -99,12 +99,16 @@
   position: fixed;
   z-index: 9999;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255,255,255,0.8);
+  background: rgba(30, 41, 59, 0.7); /* dark semi-transparent */
   align-items: center;
   justify-content: center;
+  transition: opacity 0.3s;
 ">
-  <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-    <span class="visually-hidden">Loading...</span>
+  <div style="text-align: center;">
+    <div class="spinner-border text-primary" style="width: 3.5rem; height: 3.5rem;" role="status"></div>
+    <div style="margin-top: 1rem; color: #fff; font-size: 1.25rem; letter-spacing: 1px;">
+      Refreshing...
+    </div>
   </div>
 </div>
 
@@ -168,16 +172,14 @@
 
     // Attach the refresh event listener here
     const refreshBtn = document.querySelector('.btn-info[title="Refresh"]');
+    const loadingOverlay = document.getElementById("loading-overlay");
     if (refreshBtn) {
       refreshBtn.addEventListener("click", function () {
-        // Show loading overlay
-        document.getElementById("loading-overlay").style.display = "flex";
-        // Simulate loading (e.g., 700ms), then reset and render cards
+        loadingOverlay.classList.add("active");
         setTimeout(function () {
-          spreadsheetData = JSON.parse(JSON.stringify(initialData)); // Reset data
-          renderCards(spreadsheetData); // Refresh cards
-          // Hide loading overlay
-          document.getElementById("loading-overlay").style.display = "none";
+          spreadsheetData = JSON.parse(JSON.stringify(initialData));
+          renderCards(spreadsheetData);
+          loadingOverlay.classList.remove("active");
         }, 700);
       });
     }
@@ -228,3 +230,21 @@
     appModal.hide();
   });
 </script>
+
+<style>
+  /* Add to your style-hub.html or inside a <style> tag */
+  #loading-overlay {
+    opacity: 0;
+    pointer-events: none;
+  }
+  #loading-overlay.active {
+    display: flex !important;
+    opacity: 1;
+    pointer-events: all;
+    animation: fadeIn 0.3s;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+</style>

@@ -5,4 +5,75 @@
 
 <style>
   /* Settings section specific styles can be added here */
+
+  /* Settings section container */
+  #settings-section {
+    background: #f8fafc;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    max-width: 520px;
+    margin: 40px auto;
+    padding: 32px 28px;
+    transition: box-shadow 0.2s;
+  }
+
+  #settings-section h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 28px;
+    color: #3a3a3a;
+    letter-spacing: 0.5px;
+  }
+
+  /* Form labels */
+  #settings-section .form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 6px;
+  }
+
+  /* Input fields */
+  #settings-section .form-control {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    font-size: 1rem;
+    padding: 10px 14px;
+    background: #fff;
+    transition: border-color 0.2s;
+  }
+
+  #settings-section .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.08);
+  }
+
+  /* Save buttons */
+  #settings-section .btn-primary {
+    min-width: 90px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    margin-right: 8px;
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+
+  #settings-section .btn-primary:active,
+  #settings-section .btn-primary:focus {
+    background: #0b5ed7;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.1);
+  }
+
+  /* Status messages */
+  #settings-section .mt-2 {
+    font-size: 0.97rem;
+    color: #198754;
+    min-height: 18px;
+    margin-bottom: 10px;
+  }
+
+  /* Section spacing */
+  #settings-section .mb-3,
+  #settings-section .mb-3.mt-4 {
+    margin-bottom: 22px !important;
+  }
 </style>

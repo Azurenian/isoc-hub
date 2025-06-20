@@ -151,8 +151,10 @@
 
     // Attach the refresh event listener here
     const refreshBtn = document.querySelector('.btn-info[title="Refresh"]');
+    console.log("Refresh button found:", refreshBtn); // Debug line
     if (refreshBtn) {
       refreshBtn.addEventListener("click", function () {
+        console.log("Refresh clicked"); // Debug line
         location.reload();
       });
     }

@@ -151,41 +151,40 @@
 
     // Attach the refresh event listener here
     const refreshBtn = document.querySelector('.btn-info[title="Refresh"]');
-    console.log("Refresh button found:", refreshBtn); // Debug line
     if (refreshBtn) {
       refreshBtn.addEventListener("click", function () {
-        console.log("Refresh clicked"); // Debug line
         location.reload();
+      });
+    }
+
+    // Open modal in Add mode
+    const addBtn = document.querySelector('.btn-success[title="Add"]');
+    if (addBtn) {
+      addBtn.addEventListener("click", function () {
+        document.getElementById("appModalLabel").textContent = "Add Web App";
+        document.getElementById("appForm").reset();
+        document.getElementById("editIndex").value = "";
+        appModal.show();
+      });
+    }
+
+    // Open modal in Edit mode (first card for demo)
+    const editBtn = document.querySelector('.btn-warning[title="Edit"]');
+    if (editBtn) {
+      editBtn.addEventListener("click", function () {
+        const index = 0;
+        const app = spreadsheetData[index];
+        document.getElementById("appModalLabel").textContent = "Edit Web App";
+        document.getElementById("appName").value = app.name;
+        document.getElementById("appLink").value = app.link;
+        document.getElementById("appDescription").value = app.description;
+        document.getElementById("editIndex").value = index;
+        appModal.show();
       });
     }
   });
 
-  // Open modal in Add mode
-  document
-    .querySelector('.btn-success[title="Add"]')
-    .addEventListener("click", function () {
-      document.getElementById("appModalLabel").textContent = "Add Web App";
-      document.getElementById("appForm").reset();
-      document.getElementById("editIndex").value = "";
-      appModal.show();
-    });
-
-  // Open modal in Edit mode (first card for demo)
-  document
-    .querySelector('.btn-warning[title="Edit"]')
-    .addEventListener("click", function () {
-      // For demo: edit the first app (index 0)
-      const index = 0;
-      const app = spreadsheetData[index];
-      document.getElementById("appModalLabel").textContent = "Edit Web App";
-      document.getElementById("appName").value = app.name;
-      document.getElementById("appLink").value = app.link;
-      document.getElementById("appDescription").value = app.description;
-      document.getElementById("editIndex").value = index;
-      appModal.show();
-    });
-
-  // Handle form submit for Add/Edit
+  // Handle form submit for Add/Edit (leave this outside, it's fine)
   document.getElementById("appForm").addEventListener("submit", function (e) {
     e.preventDefault();
     const name = document.getElementById("appName").value;

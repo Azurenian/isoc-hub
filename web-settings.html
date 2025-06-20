@@ -1,78 +1,70 @@
-<!--
-  web-settings.html
-  Purpose: Settings section container for the ISOC Hub application.
--->
+<div
+  id="settings-section"
+  class="section d-flex justify-content-center align-items-start"
+  style="display: none; min-height: 60vh"
+>
+  <div class="container" style="max-width: 420px; margin-top: 40px">
+    <h1 class="text-center mb-4">⚙️ Settings</h1>
+    <h2 class="mb-4">Google Sheet Connection</h2>
 
-<div class="container py-4">
-  <h2 class="mb-4">⚙️ Google Sheet Connection</h2>
-
-  <!-- Spreadsheet ID Configuration Card -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <h5 class="card-title">Spreadsheet ID</h5>
+    <div class="mb-3">
+      <label for="spreadsheet-id-input" class="form-label"
+        >Spreadsheet ID</label
+      >
       <input
         type="text"
-        class="form-control mb-3"
+        class="form-control"
         id="spreadsheet-id-input"
         placeholder="Enter Spreadsheet ID"
-        value="<?= spreadsheetId ?>"
       />
-      <button id="save-spreadsheet-id-btn" class="btn btn-success w-100 mb-2">
-        Save ID
-      </button>
-      <div id="spreadsheet-id-status" class="mt-2"></div>
     </div>
-  </div>
+    <button id="save-spreadsheet-id-btn" class="btn btn-success w-100 mb-2">
+      Save ID
+    </button>
+    <div id="spreadsheet-id-status" class="mt-2"></div>
 
-  <!-- Sheet Name Configuration Card -->
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">Sheet Name</h5>
+    <div class="mb-3 mt-4">
+      <label for="sheet-name-input" class="form-label">Sheet Name</label>
       <input
         type="text"
-        class="form-control mb-3"
+        class="form-control"
         id="sheet-name-input"
         placeholder="Enter Sheet Name"
-        value="<?= sheetName ?>"
       />
-      <button id="save-sheet-name-btn" class="btn btn-info w-100 mb-2">
-        Save Name
-      </button>
-      <div id="sheet-name-status" class="mt-2"></div>
     </div>
+    <button id="save-sheet-name-btn" class="btn btn-info w-100 mb-2">
+      Save Name
+    </button>
+    <div id="sheet-name-status" class="mt-2"></div>
   </div>
+
+  <script>
+    document.getElementById("save-spreadsheet-id-btn").onclick = function () {
+      const id = document.getElementById("spreadsheet-id-input").value.trim();
+      google.script.run
+        .withSuccessHandler(function () {
+          document.getElementById("spreadsheet-id-status").textContent =
+            "Spreadsheet ID saved!";
+        })
+        .withFailureHandler(function (err) {
+          document.getElementById("spreadsheet-id-status").textContent =
+            "Error: " + err.message;
+        })
+        .saveSpreadsheetId(id);
+    };
+
+    document.getElementById("save-sheet-name-btn").onclick = function () {
+      const name = document.getElementById("sheet-name-input").value.trim();
+      google.script.run
+        .withSuccessHandler(function () {
+          document.getElementById("sheet-name-status").textContent =
+            "Sheet Name saved!";
+        })
+        .withFailureHandler(function (err) {
+          document.getElementById("sheet-name-status").textContent =
+            "Error: " + err.message;
+        })
+        .saveSheetName(name);
+    };
+  </script>
 </div>
-
-<script>
-  // Frontend JS: Handles Save button clicks and calls backend Apps Script functions
-
-  // Save Spreadsheet ID
-  document.getElementById("save-spreadsheet-id-btn").onclick = function () {
-    const id = document.getElementById("spreadsheet-id-input").value.trim();
-    google.script.run
-      .withSuccessHandler(function () {
-        document.getElementById("spreadsheet-id-status").textContent =
-          "Spreadsheet ID saved!";
-      })
-      .withFailureHandler(function (err) {
-        document.getElementById("spreadsheet-id-status").textContent =
-          "Error: " + err.message;
-      })
-      .saveSpreadsheetId(id);
-  };
-
-  // Save Sheet Name
-  document.getElementById("save-sheet-name-btn").onclick = function () {
-    const name = document.getElementById("sheet-name-input").value.trim();
-    google.script.run
-      .withSuccessHandler(function () {
-        document.getElementById("sheet-name-status").textContent =
-          "Sheet Name saved!";
-      })
-      .withFailureHandler(function (err) {
-        document.getElementById("sheet-name-status").textContent =
-          "Error: " + err.message;
-      })
-      .saveSheetName(name);
-  };
-</script>

@@ -104,12 +104,12 @@
   let spreadsheetData = [
     {
       name: "QTR App",
-      description: "Description for App One.",
+      description: "Link for Spreadsheet.",
       link: "https://example.com/app-one",
     },
     {
       name: "Ticketing System",
-      description: "Description for App Two.",
+      description: "Link for Tickets.",
       link: "https://example.com/app-two",
     },
     {
@@ -198,8 +198,6 @@
   document
     .querySelector('.btn-info[title="Refresh"]')
     .addEventListener("click", function () {
-      // If you fetch from a backend, call your fetch function here.
-      // For now, just re-render the cards from the current spreadsheetData.
-      renderCards(spreadsheetData);
+      location.reload(); // This will refresh the entire page
     });
 </script>

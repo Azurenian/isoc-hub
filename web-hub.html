@@ -164,11 +164,18 @@ document.querySelector('.btn-info[title="Refresh"]').addEventListener('click', f
 </script>
 
 <style>
-/* Add to your CSS file or inside a <style> tag in <head> */
+#hub-section h1 {
+  color: #222 !important;           /* Strong dark for light mode */
+  text-shadow: 0 1px 2px #fff, 0 0 2px #fff;
+  font-weight: 900 !important;
+  letter-spacing: 0.5px;
+}
 @media (prefers-color-scheme: dark) {
   #hub-section h1 {
-    color: #fff !important;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    color: #fff !important;          /* White for dark mode */
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85), 0 0 2px #000;
+    font-weight: 900 !important;
+    letter-spacing: 0.5px;
   }
 }
 </style>

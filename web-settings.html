@@ -76,11 +76,23 @@
 
     function saveSpreadsheetId() {
       const input = document.getElementById("spreadsheet-id-input");
-      const id = input.value.trim();
-      if (!id) {
-        showNotification("Please enter a Spreadsheet ID.", "#dc3545");
+      let id = input.value.trim();
+
+      // Regex to extract ID from Google Sheets URL
+      const match = id.match(/\/d\/([a-zA-Z0-9-_]+)/);
+      if (match) {
+        id = match[1];
+      }
+
+      // Validate: must be 44+ chars, letters, numbers, - or _
+      if (!/^[a-zA-Z0-9-_]{30,}$/.test(id)) {
+        showNotification(
+          "Please enter a valid Google Sheets link or ID.",
+          "#dc3545"
+        );
         return;
       }
+
       input.value = ""; // Clear immediately
       showNotification("Saving Spreadsheet ID...");
       google.script.run

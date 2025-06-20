@@ -141,6 +141,10 @@
       card.innerHTML = `
       <div class="card h-100 shadow-sm border-0">
         <div class="card-body" style="min-height: 160px;">
+          <div class="form-check mb-2">
+            <input class="form-check-input card-checkbox" type="checkbox" value="" data-index="${index}">
+            <label class="form-check-label">Select</label>
+          </div>
           <h5 class="card-title fw-semibold">${app.name}</h5>
           <p class="card-text">${app.description}</p>
           <a href="${app.link}" class="btn btn-outline-primary w-100 mb-2" target="_blank">
@@ -219,14 +223,18 @@
     const topDeleteBtn = document.querySelector('.btn-danger[title="Delete"]');
     if (topDeleteBtn) {
       topDeleteBtn.addEventListener("click", function () {
-        const selected = document.querySelector('.selectable-card.selected');
-        if (!selected) {
-          alert("Please select a card to delete.");
+        const checkedBoxes = document.querySelectorAll('.card-checkbox:checked');
+        if (checkedBoxes.length === 0) {
+          alert("Please select at least one card to delete.");
           return;
         }
-        const index = selected.getAttribute('data-index');
-        if (confirm('Are you sure you want to delete this card?')) {
-          spreadsheetData.splice(index, 1);
+        if (confirm('Are you sure you want to delete the selected card(s)?')) {
+          // Collect indexes, sort descending so we can safely splice
+          const indexes = Array.from(checkedBoxes).map(cb => parseInt(cb.getAttribute('data-index')));
+          indexes.sort((a, b) => b - a);
+          indexes.forEach(idx => {
+            spreadsheetData.splice(idx, 1);
+          });
           localStorage.setItem("spreadsheetData", JSON.stringify(spreadsheetData));
           renderCards(spreadsheetData);
         }

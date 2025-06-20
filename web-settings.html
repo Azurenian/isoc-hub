@@ -1,9 +1,3 @@
-<!--
-  web-settings.html
-  Purpose: Settings section container for the ISOC Hub application.
--->
-
-<<<<<<< HEAD
 <div
   id="settings-section"
   class="section d-flex justify-content-center align-items-start"
@@ -11,51 +5,40 @@
 >
   <div class="container" style="max-width: 420px; margin-top: 40px">
     <h1 class="text-center mb-4">⚙️ Settings</h1>
-    =======
-    <div class="container py-4">
-      <h1 class="mb-4">⚙️ Google Sheet Connection</h1>
-      >>>>>>> 4fceec3330c7a8cdfa3a99dd8e62ae693329c33a
+    <h2 class="mb-4">Google Sheet Connection</h2>
 
-      <!-- Spreadsheet ID Configuration -->
-      <div class="mb-3">
-        <label for="spreadsheet-id-input" class="form-label"
-          >Spreadsheet ID</label
-        >
-        <input
-          type="text"
-          class="form-control"
-          id="spreadsheet-id-input"
-          placeholder="Enter Spreadsheet ID"
-          value=""
-        />
-      </div>
-      <button id="save-spreadsheet-id-btn" class="btn btn-success w-100 mb-2">
-        Save ID
-      </button>
-      <div id="spreadsheet-id-status" class="mt-2"></div>
-
-      <!-- Sheet Name Configuration -->
-      <div class="mb-3 mt-4">
-        <label for="sheet-name-input" class="form-label">Sheet Name</label>
-        <input
-          type="text"
-          class="form-control"
-          id="sheet-name-input"
-          placeholder="Enter Sheet Name"
-          value=""
-        />
-      </div>
-      <button id="save-sheet-name-btn" class="btn btn-info w-100 mb-2">
-        Save Name
-      </button>
-      <div id="sheet-name-status" class="mt-2"></div>
+    <div class="mb-3">
+      <label for="spreadsheet-id-input" class="form-label"
+        >Spreadsheet ID</label
+      >
+      <input
+        type="text"
+        class="form-control"
+        id="spreadsheet-id-input"
+        placeholder="Enter Spreadsheet ID"
+      />
     </div>
+    <button id="save-spreadsheet-id-btn" class="btn btn-success w-100 mb-2">
+      Save ID
+    </button>
+    <div id="spreadsheet-id-status" class="mt-2"></div>
+
+    <div class="mb-3 mt-4">
+      <label for="sheet-name-input" class="form-label">Sheet Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="sheet-name-input"
+        placeholder="Enter Sheet Name"
+      />
+    </div>
+    <button id="save-sheet-name-btn" class="btn btn-info w-100 mb-2">
+      Save Name
+    </button>
+    <div id="sheet-name-status" class="mt-2"></div>
   </div>
 
   <script>
-    // Frontend JS: Handles Save button clicks and calls backend Apps Script functions
-
-    // Auto-save Spreadsheet ID as user types
     document
       .getElementById("spreadsheet-id-input")
       .addEventListener("input", function () {
@@ -72,7 +55,6 @@
           .saveSpreadsheetId(id);
       });
 
-    // Save Spreadsheet ID on button click
     document.getElementById("save-spreadsheet-id-btn").onclick = function () {
       const id = document.getElementById("spreadsheet-id-input").value.trim();
       google.script.run
@@ -87,7 +69,6 @@
         .saveSpreadsheetId(id);
     };
 
-    // Save Sheet Name on button click
     document.getElementById("save-sheet-name-btn").onclick = function () {
       const name = document.getElementById("sheet-name-input").value.trim();
       google.script.run

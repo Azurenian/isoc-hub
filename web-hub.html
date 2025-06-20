@@ -136,7 +136,8 @@
     container.innerHTML = "";
     data.forEach((app, index) => {
       const card = document.createElement("div");
-      card.className = "col-md-4 mb-3";
+      card.className = "col-md-4 mb-3 selectable-card";
+      card.setAttribute("data-index", index);
       card.innerHTML = `
       <div class="card h-100 shadow-sm border-0">
         <div class="card-body" style="min-height: 160px;">
@@ -145,15 +146,17 @@
           <a href="${app.link}" class="btn btn-outline-primary w-100 mb-2" target="_blank">
             <span class="me-1"><i class="bi bi-box-arrow-up-right"></i></span>Open File Link
           </a>
-          <button class="btn btn-danger w-100 btn-delete" data-index="${index}">
-            <span class="me-1"><i class="bi bi-trash"></i></span>Delete
-          </button>
         </div>
       </div>
     `;
+      card.addEventListener("click", function () {
+        // Remove selection from all cards
+        document.querySelectorAll('.selectable-card.selected').forEach(el => el.classList.remove('selected'));
+        // Add selection to this card
+        card.classList.add('selected');
+      });
       container.appendChild(card);
     });
-    attachDeleteEvents(); // <-- Add this line
   }
 
   function attachDeleteEvents() {
@@ -212,6 +215,23 @@
         appModal.show();
       });
     }
+
+    const topDeleteBtn = document.querySelector('.btn-danger[title="Delete"]');
+    if (topDeleteBtn) {
+      topDeleteBtn.addEventListener("click", function () {
+        const selected = document.querySelector('.selectable-card.selected');
+        if (!selected) {
+          alert("Please select a card to delete.");
+          return;
+        }
+        const index = selected.getAttribute('data-index');
+        if (confirm('Are you sure you want to delete this card?')) {
+          spreadsheetData.splice(index, 1);
+          localStorage.setItem("spreadsheetData", JSON.stringify(spreadsheetData));
+          renderCards(spreadsheetData);
+        }
+      });
+    }
   });
 
   // Handle form submit for Add/Edit
@@ -251,5 +271,10 @@
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+  }
+
+  .selectable-card.selected > .card {
+    border: 2px solid #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
   }
 </style>

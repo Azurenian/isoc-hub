@@ -119,24 +119,8 @@
 />
 
 <script>
-  // Store the initial data
-  const initialData = [
-    {
-      name: "QTR App",
-      description: "Link for Spreadsheet.",
-      link: "https://example.com/app-one",
-    },
-    {
-      name: "Ticketing System",
-      description: "Link for Tickets.",
-      link: "https://example.com/app-two",
-    },
-    {
-      name: "App Three",
-      description: "Description for App Three.",
-      link: "https://example.com/app-three",
-    },
-  ];
+  // Store the initial data as empty
+  const initialData = [];
 
   let spreadsheetData;
   if (localStorage.getItem("spreadsheetData")) {
@@ -167,10 +151,6 @@
       container.appendChild(card);
     });
   }
-
-  // Call the function with your data
-  spreadsheetData = JSON.parse(JSON.stringify(initialData));
-  renderCards(spreadsheetData);
 
   // Bootstrap modal instance
   let appModal = null;
@@ -217,7 +197,7 @@
     }
   });
 
-  // Handle form submit for Add/Edit (leave this outside, it's fine)
+  // Handle form submit for Add/Edit
   document.getElementById("appForm").addEventListener("submit", function (e) {
     e.preventDefault();
     const name = document.getElementById("appName").value;

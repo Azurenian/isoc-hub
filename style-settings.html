@@ -26,15 +26,24 @@
     border: 1px solid #ced4da;
   }
   #settings-section .form-control:focus {
-    border-color: #0d6efd;
+    border-color: #26348d;
     box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.08);
   }
   #settings-section .btn-primary {
-    background: #0d6efd;
+    background: #26348d;
     color: #fff;
   }
   #settings-section .mt-2 {
-    color: #198754;
+    color: #26348d;
+  }
+
+  /* Save buttons custom color for light mode */
+  #settings-section .btn-success,
+  #settings-section .btn-info,
+  #settings-section .btn-primary {
+    background: #26348d !important;
+    color: #fff !important;
+    border: none;
   }
 
   /* Dark mode support */
@@ -69,7 +78,19 @@
   }
   body.dark-mode #settings-section .mt-2,
   [data-bs-theme="dark"] #settings-section .mt-2 {
-    color: #4ade80;
+    color: #26348d;
+  }
+
+  /* Save buttons custom color for dark mode */
+  body.dark-mode #settings-section .btn-success,
+  body.dark-mode #settings-section .btn-info,
+  body.dark-mode #settings-section .btn-primary,
+  [data-bs-theme="dark"] #settings-section .btn-success,
+  [data-bs-theme="dark"] #settings-section .btn-info,
+  [data-bs-theme="dark"] #settings-section .btn-primary {
+    background: #fff !important;
+    color: #26348d !important;
+    border: none;
   }
 
   /* Section spacing */

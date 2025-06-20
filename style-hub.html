@@ -7,24 +7,25 @@
   /* Hub section specific styles */
 
   /* Title styling for readability */
-  #hub-section h1 {
-    font-size: 2rem;
-    letter-spacing: 0.5px;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  #hub-section .hub-title {
+    color: #212529; /* dark text for light mode */
+    transition: color 0.3s;
+  }
+  body.dark-mode #hub-section .hub-title {
+    color: #e1e7ef; /* light text for dark mode */
   }
 
   /* Card styling */
   #hub-section .card {
     border: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    transition: 
-      transform 0.25s cubic-bezier(.4,2,.3,1), 
-      box-shadow 0.25s cubic-bezier(.4,2,.3,1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: transform 0.25s cubic-bezier(0.4, 2, 0.3, 1),
+      box-shadow 0.25s cubic-bezier(0.4, 2, 0.3, 1);
     will-change: transform, box-shadow;
   }
   #hub-section .card:hover {
     transform: translateY(-8px) scale(1.025);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
     z-index: 2;
   }
   #hub-section .card-body {
@@ -52,9 +53,9 @@
   #hub-section .btn-group .btn i {
     font-size: 1.3rem;
   }
-  #hub-section .btn-group .btn:focus, 
+  #hub-section .btn-group .btn:focus,
   #hub-section .btn-group .btn:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     outline: none;
   }
 

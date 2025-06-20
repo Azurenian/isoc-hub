@@ -63,8 +63,14 @@
       bar.textContent = message;
       bar.style.background = color;
       bar.style.display = "block";
+      // Smoothly show
+      setTimeout(() => bar.classList.add("show"), 10);
+      // Hide after 3s
       setTimeout(() => {
-        bar.style.display = "none";
+        bar.classList.remove("show");
+        setTimeout(() => {
+          bar.style.display = "none";
+        }, 400); // match transition duration
       }, 3000);
     }
 
@@ -75,12 +81,11 @@
         showNotification("Please enter a Spreadsheet ID.", "#dc3545");
         return;
       }
-      // Show notification immediately
+      input.value = ""; // Clear immediately
       showNotification("Saving Spreadsheet ID...");
       google.script.run
         .withSuccessHandler(function () {
           showNotification("Spreadsheet ID saved!");
-          input.value = ""; // Clear the input box
         })
         .withFailureHandler(function (err) {
           showNotification("Error: " + err.message, "#dc3545");
@@ -107,11 +112,11 @@
           "Please enter a Sheet Name.";
         return;
       }
+      input.value = ""; // Clear immediately
       google.script.run
         .withSuccessHandler(function () {
           document.getElementById("sheet-name-status").textContent =
             "Sheet Name saved!";
-          input.value = ""; // Clear the input box
         })
         .withFailureHandler(function (err) {
           document.getElementById("sheet-name-status").textContent =

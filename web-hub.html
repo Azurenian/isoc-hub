@@ -163,6 +163,7 @@
   }
 
   // Call the function with your data
+  spreadsheetData = JSON.parse(JSON.stringify(initialData));
   renderCards(spreadsheetData);
 
   // Bootstrap modal instance
@@ -177,8 +178,7 @@
       refreshBtn.addEventListener("click", function () {
         loadingOverlay.classList.add("active");
         setTimeout(function () {
-          spreadsheetData = JSON.parse(JSON.stringify(initialData));
-          renderCards(spreadsheetData);
+          renderCards(spreadsheetData); // Do NOT reset to initialData
           loadingOverlay.classList.remove("active");
         }, 700);
       });

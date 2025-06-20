@@ -63,6 +63,7 @@
       bar.textContent = message;
       bar.style.background = color;
       bar.style.display = "block";
+<<<<<<< HEAD
       // Smoothly show
       setTimeout(() => bar.classList.add("show"), 10);
       // Hide after 3s
@@ -71,6 +72,10 @@
         setTimeout(() => {
           bar.style.display = "none";
         }, 400); // match transition duration
+=======
+      setTimeout(() => {
+        bar.style.display = "none";
+>>>>>>> c09a2605057c3678e5d893b49115252eaca92a13
       }, 3000);
     }
 
@@ -81,11 +86,19 @@
         showNotification("Please enter a Spreadsheet ID.", "#dc3545");
         return;
       }
+<<<<<<< HEAD
       input.value = ""; // Clear immediately
+=======
+      // Show notification immediately
+>>>>>>> c09a2605057c3678e5d893b49115252eaca92a13
       showNotification("Saving Spreadsheet ID...");
       google.script.run
         .withSuccessHandler(function () {
           showNotification("Spreadsheet ID saved!");
+<<<<<<< HEAD
+=======
+          input.value = ""; // Clear the input box
+>>>>>>> c09a2605057c3678e5d893b49115252eaca92a13
         })
         .withFailureHandler(function (err) {
           showNotification("Error: " + err.message, "#dc3545");
@@ -112,11 +125,15 @@
           "Please enter a Sheet Name.";
         return;
       }
+<<<<<<< HEAD
       input.value = ""; // Clear immediately
+=======
+>>>>>>> c09a2605057c3678e5d893b49115252eaca92a13
       google.script.run
         .withSuccessHandler(function () {
           document.getElementById("sheet-name-status").textContent =
             "Sheet Name saved!";
+          input.value = ""; // Clear the input box
         })
         .withFailureHandler(function (err) {
           document.getElementById("sheet-name-status").textContent =

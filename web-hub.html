@@ -148,6 +148,14 @@
   let appModal = null;
   document.addEventListener("DOMContentLoaded", function () {
     appModal = new bootstrap.Modal(document.getElementById("appModal"));
+
+    // Attach the refresh event listener here
+    const refreshBtn = document.querySelector('.btn-info[title="Refresh"]');
+    if (refreshBtn) {
+      refreshBtn.addEventListener("click", function () {
+        location.reload();
+      });
+    }
   });
 
   // Open modal in Add mode
@@ -193,11 +201,4 @@
     renderCards(spreadsheetData);
     appModal.hide();
   });
-
-  // Make the Refresh button functional
-  document
-    .querySelector('.btn-info[title="Refresh"]')
-    .addEventListener("click", function () {
-      location.reload(); // This will refresh the entire page
-    });
 </script>

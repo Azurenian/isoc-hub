@@ -1,36 +1,20 @@
-// Code.gs (Apps Script backend)
-// PropertiesService stores key-value pairs that persist between sessions.
-// This is perfect for saving configuration settings like Spreadsheet ID and Sheet Name.
-
-// Save Spreadsheet ID
 function saveSpreadsheetId(id) {
-  PropertiesService.getScriptProperties().setProperty("SPREADSHEET_ID", id);
-}
-
-// Save Sheet Name
-function saveSheetName(name) {
-  PropertiesService.getScriptProperties().setProperty("SHEET_NAME", name);
-}
-
-// Get Spreadsheet ID (returns empty string if not set)
-function getSpreadsheetId() {
-  return (
-    PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID") || ""
+  var ss = SpreadsheetApp.openById(
+    "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
   );
-}
+  var sheet = ss.getSheets()[0]; // Use the first sheet
 
-// Get Sheet Name (returns 'Hublist' if not set)
-function getSheetName() {
-  return (
-    PropertiesService.getScriptProperties().getProperty("SHEET_NAME") ||
-    "Hublist"
-  );
-}
+  // Get all values from B2 down
+  var data = sheet.getRange("B2:B").getValues();
+  var nextRow = 2;
+  for (var i = 0; i < data.length; i++) {
+    if (!data[i][0]) {
+      nextRow = i + 2; // Row index starts at 2
+      break;
+    }
+    nextRow = i + 3;
+  }
 
-// Serve the settings page, injecting current values into the template
-function doGet() {
-  var template = HtmlService.createTemplateFromFile("Settings");
-  template.spreadsheetId = getSpreadsheetId();
-  template.sheetName = getSheetName();
-  return template.evaluate().setTitle("Settings");
+  sheet.getRange("B" + nextRow).setValue(id); // Save the ID to the next row in column B
+  return true;
 }

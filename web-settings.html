@@ -64,13 +64,13 @@
       bar.style.display = "block";
       // Smoothly show
       setTimeout(() => bar.classList.add("show"), 10);
-      // Hide after 3s
+      // Hide after 3 seconds
       setTimeout(() => {
         bar.classList.remove("show");
         setTimeout(() => {
           bar.style.display = "none";
         }, 400); // match transition duration
-      }, 3000);
+      }, 3000); // <-- 3 seconds
     }
 
     function validateInputs() {

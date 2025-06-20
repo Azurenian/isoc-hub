@@ -138,7 +138,13 @@
     },
   ];
 
-  let spreadsheetData = JSON.parse(JSON.stringify(initialData)); // Use a copy
+  let spreadsheetData;
+  if (localStorage.getItem("spreadsheetData")) {
+    spreadsheetData = JSON.parse(localStorage.getItem("spreadsheetData"));
+  } else {
+    spreadsheetData = JSON.parse(JSON.stringify(initialData));
+  }
+  renderCards(spreadsheetData);
 
   // Function to render cards
   function renderCards(data) {
@@ -226,6 +232,8 @@
       // Edit mode
       spreadsheetData[editIndex] = { name, link, description };
     }
+    // Save to localStorage
+    localStorage.setItem("spreadsheetData", JSON.stringify(spreadsheetData));
     renderCards(spreadsheetData);
     appModal.hide();
   });

@@ -37,12 +37,7 @@
         placeholder="Enter Spreadsheet ID"
       />
     </div>
-    <button id="save-spreadsheet-id-btn" class="btn btn-success w-100 mb-2">
-      Save ID
-    </button>
-    <div id="spreadsheet-id-status" class="mt-2"></div>
-
-    <div class="mb-3 mt-4">
+    <div class="mb-3">
       <label for="sheet-name-input" class="form-label">Sheet Name</label>
       <input
         type="text"
@@ -51,10 +46,14 @@
         placeholder="Enter Sheet Name"
       />
     </div>
-    <button id="save-sheet-name-btn" class="btn btn-info w-100 mb-2">
-      Save Name
+    <button
+      id="save-sheet-info-btn"
+      class="btn btn-success w-100 mb-2"
+      disabled
+    >
+      Save
     </button>
-    <div id="sheet-name-status" class="mt-2"></div>
+    <div id="sheet-info-status" class="mt-2"></div>
   </div>
 
   <script>
@@ -74,17 +73,29 @@
       }, 3000);
     }
 
-    function saveSpreadsheetId() {
-      const input = document.getElementById("spreadsheet-id-input");
-      let id = input.value.trim();
+    function validateInputs() {
+      const id = document.getElementById("spreadsheet-id-input").value.trim();
+      const name = document.getElementById("sheet-name-input").value.trim();
+      document.getElementById("save-sheet-info-btn").disabled = !(id && name);
+    }
+
+    document
+      .getElementById("spreadsheet-id-input")
+      .addEventListener("input", validateInputs);
+    document
+      .getElementById("sheet-name-input")
+      .addEventListener("input", validateInputs);
+
+    function saveSheetInfo() {
+      const idInput = document.getElementById("spreadsheet-id-input");
+      const nameInput = document.getElementById("sheet-name-input");
+      let id = idInput.value.trim();
+      let name = nameInput.value.trim();
 
       // Regex to extract ID from Google Sheets URL
       const match = id.match(/\/d\/([a-zA-Z0-9-_]+)/);
-      if (match) {
-        id = match[1];
-      }
+      if (match) id = match[1];
 
-      // Validate: must be 44+ chars, letters, numbers, - or _
       if (!/^[a-zA-Z0-9-_]{30,}$/.test(id)) {
         showNotification(
           "Please enter a valid Google Sheets link or ID.",
@@ -92,49 +103,38 @@
         );
         return;
       }
+      if (!name) {
+        showNotification("Please enter a Sheet Name.", "#dc3545");
+        return;
+      }
 
-      input.value = ""; // Clear immediately
-      showNotification("Saving Spreadsheet ID...");
+      idInput.value = "";
+      nameInput.value = "";
+      validateInputs();
+      showNotification("Saving...");
+
       google.script.run
         .withSuccessHandler(function () {
-          showNotification("Spreadsheet ID saved!");
+          showNotification("Saved!");
         })
         .withFailureHandler(function (err) {
           showNotification("Error: " + err.message, "#dc3545");
         })
-        .saveSpreadsheetId(id);
+        .saveSheetInfo(name, id); // Call new backend function
     }
 
-    document.getElementById("save-spreadsheet-id-btn").onclick =
-      saveSpreadsheetId;
+    document.getElementById("save-sheet-info-btn").onclick = saveSheetInfo;
 
+    // Optional: allow Enter key to trigger save if both fields filled
     document
-      .getElementById("spreadsheet-id-input")
+      .getElementById("sheet-name-input")
       .addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-          saveSpreadsheetId();
+        if (
+          e.key === "Enter" &&
+          !document.getElementById("save-sheet-info-btn").disabled
+        ) {
+          saveSheetInfo();
         }
       });
-
-    document.getElementById("save-sheet-name-btn").onclick = function () {
-      const input = document.getElementById("sheet-name-input");
-      const name = input.value.trim();
-      if (!name) {
-        document.getElementById("sheet-name-status").textContent =
-          "Please enter a Sheet Name.";
-        return;
-      }
-      input.value = ""; // Clear immediately
-      google.script.run
-        .withSuccessHandler(function () {
-          document.getElementById("sheet-name-status").textContent =
-            "Sheet Name saved!";
-        })
-        .withFailureHandler(function (err) {
-          document.getElementById("sheet-name-status").textContent =
-            "Error: " + err.message;
-        })
-        .saveSheetName(name);
-    };
   </script>
 </div>

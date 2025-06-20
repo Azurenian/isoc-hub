@@ -3,6 +3,25 @@
   class="section d-flex justify-content-center align-items-start"
   style="display: none; min-height: 60vh"
 >
+  <!-- Notification Bar -->
+  <div
+    id="notification-bar"
+    style="
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #28a745;
+      color: #fff;
+      text-align: center;
+      padding: 16px 0;
+      font-size: 18px;
+      z-index: 9999;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    "
+  ></div>
+
   <div class="container" style="max-width: 420px; margin-top: 40px">
     <h1 class="text-center mb-4">⚙️ Settings</h1>
     <h2 class="mb-4">Google Sheet Connection</h2>
@@ -39,25 +58,55 @@
   </div>
 
   <script>
-    document.getElementById("save-spreadsheet-id-btn").onclick = function () {
+    function showNotification(message, color = "#28a745") {
+      const bar = document.getElementById("notification-bar");
+      bar.textContent = message;
+      bar.style.background = color;
+      bar.style.display = "block";
+      setTimeout(() => {
+        bar.style.display = "none";
+      }, 3000);
+    }
+
+    function saveSpreadsheetId() {
       const input = document.getElementById("spreadsheet-id-input");
       const id = input.value.trim();
+      if (!id) {
+        showNotification("Please enter a Spreadsheet ID.", "#dc3545");
+        return;
+      }
+      // Show notification immediately
+      showNotification("Saving Spreadsheet ID...");
       google.script.run
         .withSuccessHandler(function () {
-          document.getElementById("spreadsheet-id-status").textContent =
-            "Spreadsheet ID saved!";
+          showNotification("Spreadsheet ID saved!");
           input.value = ""; // Clear the input box
         })
         .withFailureHandler(function (err) {
-          document.getElementById("spreadsheet-id-status").textContent =
-            "Error: " + err.message;
+          showNotification("Error: " + err.message, "#dc3545");
         })
         .saveSpreadsheetId(id);
-    };
+    }
+
+    document.getElementById("save-spreadsheet-id-btn").onclick =
+      saveSpreadsheetId;
+
+    document
+      .getElementById("spreadsheet-id-input")
+      .addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          saveSpreadsheetId();
+        }
+      });
 
     document.getElementById("save-sheet-name-btn").onclick = function () {
       const input = document.getElementById("sheet-name-input");
       const name = input.value.trim();
+      if (!name) {
+        document.getElementById("sheet-name-status").textContent =
+          "Please enter a Sheet Name.";
+        return;
+      }
       google.script.run
         .withSuccessHandler(function () {
           document.getElementById("sheet-name-status").textContent =

@@ -7,20 +7,10 @@
     <h1 class="text-center mb-4">⚙️ Settings</h1>
     <h2 class="mb-4">Google Sheet Connection</h2>
 
-<<<<<<< HEAD
     <div class="mb-3">
       <label for="spreadsheet-id-input" class="form-label"
         >Spreadsheet ID</label
       >
-=======
-<div class="container py-4">
-  <h2 class="mb-4">⚙️ Google Sheet Connection</h2>
-
-  <!-- Spreadsheet ID Configuration Card -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <h5 class="card-title">Spreadsheet ID</h5>
->>>>>>> cffb8f2711d5178c3939bfb8b0ee6f8a7d236e22
       <input
         type="text"
         class="form-control"
@@ -49,28 +39,14 @@
   </div>
 
   <script>
-    document
-      .getElementById("spreadsheet-id-input")
-      .addEventListener("input", function () {
-        const id = this.value.trim();
-        google.script.run
-          .withSuccessHandler(function () {
-            document.getElementById("spreadsheet-id-status").textContent =
-              "Spreadsheet ID auto-saved!";
-          })
-          .withFailureHandler(function (err) {
-            document.getElementById("spreadsheet-id-status").textContent =
-              "Error: " + err.message;
-          })
-          .saveSpreadsheetId(id);
-      });
-
     document.getElementById("save-spreadsheet-id-btn").onclick = function () {
-      const id = document.getElementById("spreadsheet-id-input").value.trim();
+      const input = document.getElementById("spreadsheet-id-input");
+      const id = input.value.trim();
       google.script.run
         .withSuccessHandler(function () {
           document.getElementById("spreadsheet-id-status").textContent =
             "Spreadsheet ID saved!";
+          input.value = ""; // Clear the input box
         })
         .withFailureHandler(function (err) {
           document.getElementById("spreadsheet-id-status").textContent =
@@ -80,11 +56,13 @@
     };
 
     document.getElementById("save-sheet-name-btn").onclick = function () {
-      const name = document.getElementById("sheet-name-input").value.trim();
+      const input = document.getElementById("sheet-name-input");
+      const name = input.value.trim();
       google.script.run
         .withSuccessHandler(function () {
           document.getElementById("sheet-name-status").textContent =
             "Sheet Name saved!";
+          input.value = ""; // Clear the input box
         })
         .withFailureHandler(function (err) {
           document.getElementById("sheet-name-status").textContent =

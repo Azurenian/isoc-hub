@@ -100,8 +100,8 @@
 />
 
 <script>
-  // Example spreadsheet data (replace with your actual data source)
-  let spreadsheetData = [
+  // Store the initial data
+  const initialData = [
     {
       name: "QTR App",
       description: "Link for Spreadsheet.",
@@ -118,6 +118,8 @@
       link: "https://example.com/app-three",
     },
   ];
+
+  let spreadsheetData = JSON.parse(JSON.stringify(initialData)); // Use a copy
 
   // Function to render cards
   function renderCards(data) {
@@ -153,7 +155,8 @@
     const refreshBtn = document.querySelector('.btn-info[title="Refresh"]');
     if (refreshBtn) {
       refreshBtn.addEventListener("click", function () {
-        renderCards(spreadsheetData); // Only refresh the Hub section/cards
+        spreadsheetData = JSON.parse(JSON.stringify(initialData)); // Reset data
+        renderCards(spreadsheetData); // Refresh cards
       });
     }
 

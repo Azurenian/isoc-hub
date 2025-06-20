@@ -4,9 +4,7 @@
 -->
 
 <style>
-  /* Settings section specific styles can be added here */
-
-  /* Settings section container */
+  /* Light mode (default) */
   #settings-section {
     background: #f8fafc;
     border-radius: 12px;
@@ -14,65 +12,79 @@
     max-width: 520px;
     margin: 40px auto;
     padding: 32px 28px;
-    transition: box-shadow 0.2s;
+    transition: box-shadow 0.2s, background 0.2s;
   }
   #settings-section h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 28px;
     color: #3a3a3a;
-    letter-spacing: 0.5px;
   }
-
-  /* Form labels */
   #settings-section .form-label {
-    font-weight: 600;
     color: #495057;
-    margin-bottom: 6px;
   }
-
-  /* Input fields */
   #settings-section .form-control {
-    border-radius: 6px;
-    border: 1px solid #ced4da;
-    font-size: 1rem;
-    padding: 10px 14px;
     background: #fff;
-    transition: border-color 0.2s;
+    color: #212529;
+    border: 1px solid #ced4da;
   }
-
   #settings-section .form-control:focus {
     border-color: #0d6efd;
     box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.08);
   }
-
-  /* Save buttons */
   #settings-section .btn-primary {
-    min-width: 90px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    margin-bottom: 8px;
-    margin-right: 8px;
-    transition: background 0.2s, box-shadow 0.2s;
+    background: #0d6efd;
+    color: #fff;
   }
-
-  #settings-section .btn-primary:active,
-  #settings-section .btn-primary:focus {
-    background: #0b5ed7;
-    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.1);
-  }
-
-  /* Status messages */
   #settings-section .mt-2 {
-    font-size: 0.97rem;
     color: #198754;
-    min-height: 18px;
-    margin-bottom: 10px;
+  }
+
+  /* Dark mode support */
+  body.dark-mode #settings-section,
+  [data-bs-theme="dark"] #settings-section {
+    background: #23272f;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+  }
+  body.dark-mode #settings-section h1,
+  [data-bs-theme="dark"] #settings-section h1 {
+    color: #f1f3f8;
+  }
+  body.dark-mode #settings-section .form-label,
+  [data-bs-theme="dark"] #settings-section .form-label {
+    color: #bfc9d8;
+  }
+  body.dark-mode #settings-section .form-control,
+  [data-bs-theme="dark"] #settings-section .form-control {
+    background: #181b20;
+    color: #f1f3f8;
+    border: 1px solid #343a40;
+  }
+  body.dark-mode #settings-section .form-control:focus,
+  [data-bs-theme="dark"] #settings-section .form-control:focus {
+    border-color: #66aaff;
+    box-shadow: 0 0 0 2px rgba(102, 170, 255, 0.12);
+  }
+  body.dark-mode #settings-section .btn-primary,
+  [data-bs-theme="dark"] #settings-section .btn-primary {
+    background: #2563eb;
+    color: #fff;
+  }
+  body.dark-mode #settings-section .mt-2,
+  [data-bs-theme="dark"] #settings-section .mt-2 {
+    color: #4ade80;
   }
 
   /* Section spacing */
   #settings-section .mb-3,
   #settings-section .mb-3.mt-4 {
     margin-bottom: 22px !important;
+  }
+
+  @media (max-width: 600px) {
+    #settings-section {
+      padding: 18px 6px;
+      max-width: 98vw;
+    }
+    #settings-section h1 {
+      font-size: 1.3rem;
+    }
   }
 </style>

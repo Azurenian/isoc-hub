@@ -3,45 +3,76 @@
   Purpose: Settings section container for the ISOC Hub application.
 -->
 
-<div id="settings-section" class="section" style="display: none">
-  <div class="container-fluid py-4">
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <h1>This is Settings</h1>
-=======
-    <h1>DUGAY SINYO MAG START </h1>
->>>>>>> 7ab954a823b4f11a87c65a942ba8b938daab3ebd
-=======
-    <h1>⚙️ Settings</h1>
+<div class="container py-4">
+  <h1 class="mb-4">⚙️ Settings</h1>
 
-    <!-- Spreadsheet ID Configuration -->
-    <div class="mb-3">
-      <label for="spreadsheet-id-input" class="form-label"
-        >Spreadsheet ID</label
-      >
+  <!-- Spreadsheet ID Configuration Card -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Spreadsheet ID</h5>
       <input
         type="text"
-        class="form-control"
+        class="form-control mb-3"
         id="spreadsheet-id-input"
         placeholder="Enter Spreadsheet ID"
+        value="<?= spreadsheetId ?>"
       />
+      <button id="save-spreadsheet-id-btn" class="btn btn-success w-100 mb-2">
+        Save ID
+      </button>
+      <div id="spreadsheet-id-status" class="mt-2"></div>
     </div>
-    <button id="save-spreadsheet-id-btn" class="btn btn-primary">Save</button>
-    <div id="spreadsheet-id-status" class="mt-2"></div>
+  </div>
 
-    <!-- Sheet Name Configuration -->
-    <div class="mb-3 mt-4">
-      <label for="sheet-name-input" class="form-label">Sheet Name</label>
+  <!-- Sheet Name Configuration Card -->
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Sheet Name</h5>
       <input
         type="text"
-        class="form-control"
+        class="form-control mb-3"
         id="sheet-name-input"
         placeholder="Enter Sheet Name"
-        value="Hublist"
+        value="<?= sheetName ?>"
       />
+      <button id="save-sheet-name-btn" class="btn btn-info w-100 mb-2">
+        Save Name
+      </button>
+      <div id="sheet-name-status" class="mt-2"></div>
     </div>
-    <button id="save-sheet-name-btn" class="btn btn-primary">Save</button>
-    <div id="sheet-name-status" class="mt-2"></div>
->>>>>>> 8305b5815fa40e3850eda1ca86c0716c031e5820
   </div>
 </div>
+
+<script>
+  // Frontend JS: Handles Save button clicks and calls backend Apps Script functions
+
+  // Save Spreadsheet ID
+  document.getElementById("save-spreadsheet-id-btn").onclick = function () {
+    const id = document.getElementById("spreadsheet-id-input").value.trim();
+    google.script.run
+      .withSuccessHandler(function () {
+        document.getElementById("spreadsheet-id-status").textContent =
+          "Spreadsheet ID saved!";
+      })
+      .withFailureHandler(function (err) {
+        document.getElementById("spreadsheet-id-status").textContent =
+          "Error: " + err.message;
+      })
+      .saveSpreadsheetId(id);
+  };
+
+  // Save Sheet Name
+  document.getElementById("save-sheet-name-btn").onclick = function () {
+    const name = document.getElementById("sheet-name-input").value.trim();
+    google.script.run
+      .withSuccessHandler(function () {
+        document.getElementById("sheet-name-status").textContent =
+          "Sheet Name saved!";
+      })
+      .withFailureHandler(function (err) {
+        document.getElementById("sheet-name-status").textContent =
+          "Error: " + err.message;
+      })
+      .saveSheetName(name);
+  };
+</script>

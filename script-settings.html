@@ -2,4 +2,44 @@
 <script>
   // Settings-specific JavaScript functionality can be added here
   console.log('Settings section loaded');
+
+  function fetchSheetData() {
+    const id = document.getElementById("spreadsheet-id-input").value.trim();
+    const name = document.getElementById("sheet-name-input").value.trim();
+    if (!id || !name) return;
+
+    document.getElementById("sheet-info-status").textContent = "Fetching data...";
+    google.script.run
+      .withSuccessHandler(function(data) {
+        document.getElementById("sheet-info-status").textContent = "";
+        renderSheetData(data);
+      })
+      .withFailureHandler(function(err) {
+        document.getElementById("sheet-info-status").textContent = "Error: " + err.message;
+        document.getElementById("sheet-data-container").style.display = "none";
+      })
+      .fetchSheetData(id, name);
+  }
+
+  function renderSheetData(data) {
+    const container = document.getElementById("sheet-data-container");
+    const table = document.getElementById("sheet-data-table");
+    if (!data || !data.length) {
+      container.style.display = "none";
+      return;
+    }
+    // Render header
+    const thead = table.querySelector("thead");
+    thead.innerHTML = "<tr>" + data[0].map(h => `<th>${h}</th>`).join("") + "</tr>";
+    // Render body
+    const tbody = table.querySelector("tbody");
+    tbody.innerHTML = data.slice(1).map(row =>
+      "<tr>" + row.map(cell => `<td>${cell}</td>`).join("") + "</tr>"
+    ).join("");
+    container.style.display = "";
+  }
+
+  // Fetch data when either input changes and both are filled
+  document.getElementById("spreadsheet-id-input").addEventListener("blur", fetchSheetData);
+  document.getElementById("sheet-name-input").addEventListener("blur", fetchSheetData);
 </script>

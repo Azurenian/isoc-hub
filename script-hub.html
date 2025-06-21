@@ -1,5 +1,44 @@
+<!-- Notification Bar -->
+<div id="hub-notification-bar" style="
+  display: none;
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 280px;
+  max-width: 90vw;
+  z-index: 9999;
+  background: #198754;
+  color: #fff;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  opacity: 0;
+  transition: opacity 0.4s, top 0.4s;
+"></div>
+
 <!-- Hub Section Scripts -->
 <script>
   // Hub-specific JavaScript functionality can be added here
   console.log('Hub section loaded');
+
+  // Show notification with smooth transition
+  function showHubNotification(message, color = "#198754") {
+    const bar = document.getElementById("hub-notification-bar");
+    bar.textContent = message;
+    bar.style.background = color;
+    bar.style.display = "block";
+    setTimeout(() => {
+      bar.style.opacity = "1";
+      bar.style.top = "40px";
+    }, 10);
+    setTimeout(() => {
+      bar.style.opacity = "0";
+      bar.style.top = "24px";
+      setTimeout(() => {
+        bar.style.display = "none";
+      }, 400);
+    }, 2500);
+  }
 </script>

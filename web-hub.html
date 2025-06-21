@@ -185,23 +185,13 @@
 
   // Bootstrap modal instance
   let appModal = null;
+  let topDeleteBtn = null; // Move to global scope
+  let deleteMode = false;  // Move to global scope
+
   document.addEventListener("DOMContentLoaded", function () {
     appModal = new bootstrap.Modal(document.getElementById("appModal"));
 
-    // Attach the refresh event listener here
-    const refreshBtn = document.querySelector('.btn-info[title="Refresh"]');
-    const loadingOverlay = document.getElementById("loading-overlay");
-    if (refreshBtn) {
-      refreshBtn.addEventListener("click", function () {
-        loadingOverlay.classList.add("active");
-        setTimeout(function () {
-          renderCards(spreadsheetData); // Do NOT reset to initialData
-          loadingOverlay.classList.remove("active");
-        }, 700);
-      });
-    }
-
-    // Open modal in Add mode
+    // Add Button
     const addBtn = document.querySelector('.btn-success[title="Add"]');
     if (addBtn) {
       addBtn.addEventListener("click", function () {
@@ -212,13 +202,18 @@
       });
     }
 
-    // Open modal in Edit mode (first card for demo)
+    // Edit Button (edit first selected card)
     const editBtn = document.querySelector('.btn-warning[title="Edit"]');
     if (editBtn) {
       editBtn.addEventListener("click", function () {
-        const index = 0;
+        const checked = document.querySelector('.card-checkbox:checked');
+        if (!checked) {
+          alert("Please select a card to edit.");
+          return;
+        }
+        const index = checked.getAttribute('data-index');
         const app = spreadsheetData[index];
-        document.getElementById("appModalLabel").textContent = "Edit Web App";
+        document.getElementById("appModalLabel").textContent = "Edit Spreadsheet";
         document.getElementById("appName").value = app.name;
         document.getElementById("appLink").value = app.link;
         document.getElementById("appDescription").value = app.description;
@@ -227,24 +222,22 @@
       });
     }
 
-    const topDeleteBtn = document.querySelector('.btn-danger[title="Delete"]');
-    let deleteMode = false;
-
+    // Delete Button (toggle checkbox visibility and confirm delete)
+    topDeleteBtn = document.querySelector('.btn-danger[title="Delete"]');
     if (topDeleteBtn) {
       topDeleteBtn.addEventListener("click", function () {
         const allCheckboxWrappers = document.querySelectorAll('.card-checkbox-wrapper');
         const allCheckboxes = document.querySelectorAll('.card-checkbox');
 
         if (!deleteMode) {
-          // Enter delete mode: show checkboxes
+          // Show checkboxes
           allCheckboxWrappers.forEach(div => div.style.display = "block");
           deleteMode = true;
           topDeleteBtn.innerHTML = `<span class="me-1 fs-5"><i class="bi bi-trash"></i></span><span>Confirm Delete</span>`;
         } else {
-          // Confirm delete: remove selected cards
+          // Delete selected
           const checkedBoxes = document.querySelectorAll('.card-checkbox:checked');
           if (checkedBoxes.length > 0) {
-            // Collect indexes, sort descending so we can safely splice
             const indexes = Array.from(checkedBoxes).map(cb => parseInt(cb.getAttribute('data-index')));
             indexes.sort((a, b) => b - a);
             indexes.forEach(idx => {
@@ -253,12 +246,25 @@
             localStorage.setItem("spreadsheetData", JSON.stringify(spreadsheetData));
             renderCards(spreadsheetData);
           }
-          // Exit delete mode: hide checkboxes and reset button
+          // Hide checkboxes and reset button
           allCheckboxWrappers.forEach(div => div.style.display = "none");
           allCheckboxes.forEach(cb => cb.checked = false);
           deleteMode = false;
           topDeleteBtn.innerHTML = `<span class="me-1 fs-5"><i class="bi bi-trash"></i></span><span>Delete</span>`;
         }
+      });
+    }
+
+    // Refresh Button
+    const refreshBtn = document.querySelector('.btn-info[title="Refresh"]');
+    const loadingOverlay = document.getElementById("loading-overlay");
+    if (refreshBtn) {
+      refreshBtn.addEventListener("click", function () {
+        loadingOverlay.classList.add("active");
+        setTimeout(function () {
+          renderCards(spreadsheetData);
+          loadingOverlay.classList.remove("active");
+        }, 700);
       });
     }
   });

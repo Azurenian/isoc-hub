@@ -406,7 +406,7 @@
             showHubNotification("Added successfully!");
             loadWebApps();
           })
-          .addWebAppToSheet(name, link, description, photo);
+          .addWebAppToSheet(name, link, description); // remove photo
       } else {
         // Edit mode: update spreadsheet
         google.script.run
@@ -415,7 +415,7 @@
             loadWebApps();
             window.selectedCardIndex = undefined;
           })
-          .editWebAppInSheet(editIndex, name, link, description, photo);
+          .editWebAppInSheet(editIndex, name, link, description); // remove photo
       }
       appModal.hide();
     });

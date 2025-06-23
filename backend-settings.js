@@ -8,11 +8,13 @@ function findRowBySheetName(sheetName) {
   var sheet = ss.getSheets()[0];
   var data = sheet.getDataRange().getValues();
   for (var i = 1; i < data.length; i++) {
-    if (String(data[i][0]).trim().toLowerCase() === sheetName.trim().toLowerCase()) {
+    if (
+      String(data[i][0]).trim().toLowerCase() === sheetName.trim().toLowerCase()
+    ) {
       return {
-        id: data[i][0],         // A cell
+        id: data[i][0], // A cell
         spreadsheetId: data[i][1], // B cell
-        description: data[i][2] // C cell
+        description: data[i][2], // C cell
       };
     }
   }
@@ -31,9 +33,9 @@ function findRowBySpreadsheetId(spreadsheetId) {
       String(data[i][1]).includes(spreadsheetId.trim())
     ) {
       return {
-        id: data[i][0],         // A cell
+        id: data[i][0], // A cell
         spreadsheetId: data[i][1], // B cell
-        description: data[i][2] // C cell
+        description: data[i][2], // C cell
       };
     }
   }
@@ -148,4 +150,18 @@ function fetchSheetDataByName(sheetName) {
   } catch (e) {
     throw new Error("Unable to fetch data: " + e.message);
   }
+}
+
+function addCommentToSheet(name, comment, cardId) {
+  var ss = SpreadsheetApp.openById(
+    "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
+  );
+  var sheet = ss.getSheetByName("Comments");
+  var lastRow = sheet.getLastRow();
+  var nextRow = lastRow + 1;
+  // Write name to column A, comment to column B, cardId to column C
+  sheet.getRange("A" + nextRow).setValue(name);
+  sheet.getRange("B" + nextRow).setValue(comment);
+  sheet.getRange("C" + nextRow).setValue(cardId);
+  return true;
 }

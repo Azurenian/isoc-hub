@@ -1,27 +1,30 @@
 <!-- Notification Bar -->
-<div id="hub-notification-bar" style="
-  display: none;
-  position: fixed;
-  top: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  min-width: 280px;
-  max-width: 90vw;
-  z-index: 9999;
-  background: #198754;
-  color: #fff;
-  padding: 14px 32px;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-  opacity: 0;
-  transition: opacity 0.4s, top 0.4s;
-"></div>
+<div
+  id="hub-notification-bar"
+  style="
+    display: none;
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 280px;
+    max-width: 90vw;
+    z-index: 9999;
+    background: #198754;
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    opacity: 0;
+    transition: opacity 0.4s, top 0.4s;
+  "
+></div>
 
 <!-- Hub Section Scripts -->
 <script>
   // Hub-specific JavaScript functionality can be added here
-  console.log('Hub section loaded');
+  console.log("Hub section loaded");
 
   // Show notification with smooth transition
   function showHubNotification(message, color = "#198754") {
@@ -41,4 +44,63 @@
       }, 400);
     }, 2500);
   }
+
+  let commentModal = null;
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // ...existing code...
+
+    commentModal = new bootstrap.Modal(document.getElementById("commentModal"));
+
+    // Add event listeners for comment buttons after rendering cards
+    function addCommentButtonListeners() {
+      document.querySelectorAll(".comment-card-btn").forEach((btn) => {
+        btn.onclick = function () {
+          const index = btn.getAttribute("data-index");
+          const app = spreadsheetData[index];
+          document.getElementById("commentCardId").value = app.id || index; // Use unique ID if available, else index
+          document.getElementById("commentForm").reset();
+          commentModal.show();
+        };
+      });
+    }
+
+    // Call after rendering cards
+    function renderCards(data) {
+      // ...existing render code...
+      addCommentButtonListeners();
+      // ...existing render code...
+    }
+
+    // Handle comment form submit
+    document
+      .getElementById("commentForm")
+      .addEventListener("submit", function (e) {
+        e.preventDefault();
+        const name = document.getElementById("commentName").value.trim();
+        const comment = document.getElementById("commentText").value.trim();
+        const cardId = document.getElementById("commentCardId").value;
+
+        if (!name || !comment) {
+          showHubNotification("Please enter your name and comment.", "#dc3545");
+          return;
+        }
+
+        google.script.run
+          .withSuccessHandler(function () {
+            showHubNotification("Comment submitted!");
+            commentModal.hide();
+            window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll to top
+          })
+          .withFailureHandler(function (err) {
+            showHubNotification(
+              "Failed to submit comment: " + err.message,
+              "#dc3545"
+            );
+          })
+          .addCommentToSheet(name, comment, cardId);
+      });
+
+    // ...existing code...
+  });
 </script>

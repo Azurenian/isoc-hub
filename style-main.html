@@ -12,3 +12,21 @@
     display: block;
   }
 </style>
+
+<script>
+  // DOM elements
+  const darkModeToggle = document.getElementById("dark-light-toggle");
+
+  if (darkModeToggle) {
+    // Enable the toggle that's currently disabled
+    darkModeToggle.disabled = false;
+
+    // Set initial state based on preference
+    setTheme(getColorPreference());
+
+    // Handle toggle clicks
+    darkModeToggle.addEventListener("change", () => {
+      setTheme(darkModeToggle.checked ? "dark" : "light");
+    });
+  }
+</script>

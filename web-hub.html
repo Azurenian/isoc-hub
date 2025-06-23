@@ -475,30 +475,7 @@
           .withSuccessHandler(function () {
             // Update local data
             spreadsheetData[editIndex] = { name, link, description, photo };
-            addOrUpdateCard({ name, link, description, photo }, editIndex);
-            addCommentButtonListeners();
-            // Re-attach select button event for the updated card
-            const selectBtn = document.querySelector(
-              `.col-md-4.mb-3[data-index="${editIndex}"] .select-card-btn`
-            );
-            if (selectBtn) {
-              selectBtn.onclick = function () {
-                const cardDiv = selectBtn.closest(".card.h-100");
-                const index = parseInt(selectBtn.getAttribute("data-index"));
-                if (window.selectedCardIndex === index) {
-                  cardDiv.classList.remove("border-primary", "shadow");
-                  window.selectedCardIndex = undefined;
-                } else {
-                  document
-                    .querySelectorAll(".card.h-100")
-                    .forEach((c) =>
-                      c.classList.remove("border-primary", "shadow")
-                    );
-                  cardDiv.classList.add("border-primary", "shadow");
-                  window.selectedCardIndex = index;
-                }
-              };
-            }
+            renderCards(spreadsheetData); // Re-render all cards and update event listeners
             window.selectedCardIndex = undefined;
             showHubNotification("Updated successfully!");
           })

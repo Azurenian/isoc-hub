@@ -1,8 +1,4 @@
-<div
-  id="settings-section"
-  class="section d-flex justify-content-center align-items-start"
-  style="display: none; min-height: 60vh"
->
+<div id="settings-section" class="section">
   <!-- Notification Bar -->
   <div
     id="notification-bar"
@@ -23,7 +19,7 @@
   ></div>
 
   <div class="container" style="max-width: 420px; margin-top: 40px">
-    <h2 class="mb-4">⚙️ Google Sheet Connection</h2>
+    <h2 class="mb-4">Google Sheet Connection</h2>
 
     <div class="mb-3">
       <label for="spreadsheet-id-input" class="form-label"
@@ -35,6 +31,13 @@
         id="spreadsheet-id-input"
         placeholder="Enter Spreadsheet ID"
       />
+      <button
+        id="search-by-id-btn"
+        class="btn btn-primary w-100 mt-2"
+        type="button"
+      >
+        Search by Spreadsheet ID
+      </button>
     </div>
     <div class="mb-3">
       <label for="sheet-name-input" class="form-label">Sheet Name</label>
@@ -44,53 +47,117 @@
         id="sheet-name-input"
         placeholder="Enter Sheet Name"
       />
+      <button
+        id="search-by-name-btn"
+        class="btn btn-primary w-100 mt-2"
+        type="button"
+      >
+        Search by Sheet Name
+      </button>
     </div>
-    <button
-      id="save-sheet-info-btn"
-      class="btn btn-success w-100 mb-2"
-      disabled
-    >
-      Save
-    </button>
     <div id="sheet-info-status" class="mt-2"></div>
+
+    <!-- Table for displaying fetched data -->
+    <div id="sheet-data-container" class="mt-4" style="display: none">
+      <h5>Sheet Data Preview</h5>
+      <div class="table-responsive">
+        <table id="sheet-data-table" class="table table-bordered table-sm">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <script>
+    <<<<<<< HEAD
+    function showNotification(message, color = "#28a745") {
+      const bar = document.getElementById("notification-bar");
+      bar.textContent = message;
+      bar.style.background = color;
+      bar.style.display = "block";
+      setTimeout(() => bar.classList.add("show"), 10);
+      setTimeout(() => {
+        bar.classList.remove("show");
+        setTimeout(() => {
+          bar.style.display = "none";
+        }, 400);
+      }, 3000);
+    }
+    =======
         function showNotification(message, color = "#28a745") {
           const bar = document.getElementById("notification-bar");
           bar.textContent = message;
           bar.style.background = color;
           bar.style.display = "block";
-          // Smoothly show
-          setTimeout(() => bar.classList.add("show"), 10);
-          // Hide after 3 seconds
           setTimeout(() => {
-            bar.classList.remove("show");
-            setTimeout(() => {
-              bar.style.display = "none";
-            }, 400); // match transition duration
-          }, 3000); // <-- 3 seconds
+            bar.style.display = "none";
+          }, 3000);
         }
+    >>>>>>> b5955e0340085a734808bb8e1a69df9acaf91811
 
-        function validateInputs() {
-          const id = document.getElementById("spreadsheet-id-input").value.trim();
-          const name = document.getElementById("sheet-name-input").value.trim();
-          document.getElementById("save-sheet-info-btn").disabled = !(id && name);
-        }
+    function renderSingleRow(data) {
+      const container = document.getElementById("sheet-data-container");
+      const table = document.getElementById("sheet-data-table");
+      if (!data) {
+        container.style.display = "none";
+        return;
+      }
+      // Render header
+      const thead = table.querySelector("thead");
+      thead.innerHTML = "<tr><th>ID</th><th>Name</th><th>Description</th></tr>";
+      // Render body
+      const tbody = table.querySelector("tbody");
+      tbody.innerHTML = `<tr>
+        <td>${data.id}</td>
+        <td>${data.name}</td>
+        <td>${data.description}</td>
+      </tr>`;
+      container.style.display = "";
+    }
 
-        document
-          .getElementById("spreadsheet-id-input")
-          .addEventListener("input", validateInputs);
-        document
-          .getElementById("sheet-name-input")
-          .addEventListener("input", validateInputs);
+    function fetchById() {
+      const id = document.getElementById("spreadsheet-id-input").value.trim();
+      if (!id) {
+        showNotification("Please enter a Spreadsheet ID.", "#dc3545");
+        return;
+      }
+      document.getElementById("sheet-info-status").textContent = "Searching...";
+      google.script.run
+        .withSuccessHandler(function(data) {
+          document.getElementById("sheet-info-status").textContent = "";
+          renderSingleRow(data);
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById("sheet-info-status").textContent = "Error: " + err.message;
+          document.getElementById("sheet-data-container").style.display = "none";
+        })
+        .findRowBySpreadsheetId(id);
+    }
 
-        function saveSheetInfo() {
-          const idInput = document.getElementById("spreadsheet-id-input");
-          const nameInput = document.getElementById("sheet-name-input");
-          let id = idInput.value.trim();
-          let name = nameInput.value.trim();
+    function fetchByName() {
+      const name = document.getElementById("sheet-name-input").value.trim();
+      if (!name) {
+        showNotification("Please enter a Sheet Name.", "#dc3545");
+        return;
+      }
+      document.getElementById("sheet-info-status").textContent = "Searching...";
+      google.script.run
+        .withSuccessHandler(function(data) {
+          document.getElementById("sheet-info-status").textContent = "";
+          renderSingleRow(data);
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById("sheet-info-status").textContent = "Error: " + err.message;
+          document.getElementById("sheet-data-container").style.display = "none";
+        })
+        .findRowBySheetName(name); // This must match the Apps Script function name
+    }
 
+    <<<<<<< HEAD
+    document.getElementById("search-by-id-btn").onclick = fetchById;
+    document.getElementById("search-by-name-btn").onclick = fetchByName;
+    =======
           // Regex to extract ID from Google Sheets URL
           const match = id.match(/\/d\/([a-zA-Z0-9-_]+)/);
           if (match) id = match[1];
@@ -100,28 +167,18 @@
               "Please enter a valid Google Sheets link or ID.",
               "#dc3545"
             );
-    <<<<<<< HEAD
-    =======
-            return;
-          }
-          if (!name) {
-            showNotification("Please enter a Sheet Name.", "#dc3545");
-    >>>>>>> b5955e0340085a734808bb8e1a69df9acaf91811
             return;
           }
           if (!name) {
             showNotification("Please enter a Sheet Name.", "#dc3545");
             return;
           }
-
-          idInput.value = "";
-          nameInput.value = "";
-          validateInputs();
-          showNotification("Saving...");
-
+          // Show notification immediately
+          showNotification("Saving Spreadsheet ID...");
           google.script.run
             .withSuccessHandler(function () {
-              showNotification("Saved!");
+              showNotification("Spreadsheet ID saved!");
+              input.value = ""; // Clear the input box
             })
             .withFailureHandler(function (err) {
               showNotification("Error: " + err.message, "#dc3545");
@@ -135,12 +192,31 @@
         document
           .getElementById("sheet-name-input")
           .addEventListener("keydown", function (e) {
-            if (
-              e.key === "Enter" &&
-              !document.getElementById("save-sheet-info-btn").disabled
-            ) {
-              saveSheetInfo();
+            if (e.key === "Enter") {
+              saveSpreadsheetId();
             }
           });
+
+        document.getElementById("save-sheet-name-btn").onclick = function () {
+          const input = document.getElementById("sheet-name-input");
+          const name = input.value.trim();
+          if (!name) {
+            document.getElementById("sheet-name-status").textContent =
+              "Please enter a Sheet Name.";
+            return;
+          }
+          google.script.run
+            .withSuccessHandler(function () {
+              document.getElementById("sheet-name-status").textContent =
+                "Sheet Name saved!";
+              input.value = ""; // Clear the input box
+            })
+            .withFailureHandler(function (err) {
+              document.getElementById("sheet-name-status").textContent =
+                "Error: " + err.message;
+            })
+            .saveSheetName(name);
+        };
+    >>>>>>> b5955e0340085a734808bb8e1a69df9acaf91811
   </script>
 </div>

@@ -40,10 +40,7 @@
 
     <!-- Main Content Area -->
     <div class="main-content">
-      <!-- Hub Section -->
       <?!= include('web-hub'); ?>
-
-      <!-- Settings Section -->
       <?!= include('web-settings'); ?>
     </div>
 
@@ -57,5 +54,186 @@
     <?!= include('script-sidebar'); ?>
     <?!= include('script-hub'); ?>
     <?!= include('script-settings'); ?>
+    <script>
+      // Example data source
+      let apps = [
+        {
+          name: "App 1",
+          description: "Description for App 1",
+          link: "https://example.com/app1",
+        },
+        {
+          name: "App 2",
+          description: "Description for App 2",
+          link: "https://example.com/app2",
+        },
+        // Add more app objects as needed
+      ];
+
+      // Render cards function
+      function renderCards(data) {
+        const cardContainer = document.querySelector(".card-container");
+        cardContainer.innerHTML = "";
+        data.forEach((app, index) => {
+          const card = document.createElement("div");
+          card.className = "col-md-4 mb-4";
+          card.innerHTML = `
+            <div class="card h-100 shadow-sm border-0">
+              <div class="card-body d-flex flex-column">
+                <div class="form-check mb-2 card-checkbox-wrapper" style="display: none;">
+                  <input class="form-check-input card-checkbox" type="checkbox" value="" data-index="${index}">
+                  <label class="form-check-label">Select</label>
+                </div>
+                <h5 class="card-title fw-semibold">${app.name}</h5>
+                <p class="card-text flex-grow-1">${app.description}</p>
+                <a href="${app.link}" class="btn btn-outline-primary w-100 mt-auto" target="_blank">
+                  <span class="me-1"><i class="bi bi-box-arrow-up-right"></i></span>Open Link
+                </a>
+              </div>
+            </div>
+          `;
+          cardContainer.appendChild(card);
+        });
+      }
+
+      // Initial render
+      renderCards(apps);
+
+      // Delete button logic
+      let deleteMode = false;
+      const deleteBtn = document.querySelector('.btn-danger[title="Delete"]');
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", function () {
+          const allCheckboxWrappers = document.querySelectorAll('.card-checkbox-wrapper');
+          const allCheckboxes = document.querySelectorAll('.card-checkbox');
+
+          if (!deleteMode) {
+            // Show checkboxes and change button text
+            allCheckboxWrappers.forEach(div => div.style.display = "block");
+            deleteMode = true;
+            deleteBtn.innerHTML = `<span class="me-1 fs-5"><i class="bi bi-trash"></i></span><span>Confirm Deletion</span>`;
+          } else {
+            // Delete selected cards
+            const checkedBoxes = document.querySelectorAll('.card-checkbox:checked');
+            if (checkedBoxes.length > 0) {
+              const indexes = Array.from(checkedBoxes).map(cb => parseInt(cb.getAttribute('data-index')));
+              indexes.sort((a, b) => b - a);
+              indexes.forEach(idx => {
+                apps.splice(idx, 1);
+              });
+              renderCards(apps);
+            }
+            // Hide checkboxes and reset button
+            document.querySelectorAll('.card-checkbox-wrapper').forEach(div => div.style.display = "none");
+            document.querySelectorAll('.card-checkbox').forEach(cb => cb.checked = false);
+            deleteMode = false;
+            deleteBtn.innerHTML = `<span class="me-1 fs-5"><i class="bi bi-trash"></i></span><span>Delete</span>`;
+          }
+        });
+      }
+
+      // Add Button logic
+      const addBtn = document.querySelector('.btn-success[title="Add"]');
+      let appModal = null;
+      document.addEventListener("DOMContentLoaded", function () {
+        appModal = new bootstrap.Modal(document.getElementById("appModal"));
+        if (addBtn) {
+          addBtn.addEventListener("click", function () {
+            document.getElementById("appModalLabel").textContent = "Add App";
+            document.getElementById("appForm").reset();
+            appModal.show();
+          });
+        }
+      });
+
+      // Handle form submit for Add
+      document.getElementById("appForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const name = document.getElementById("appName").value;
+        const link = document.getElementById("appLink").value;
+        const description = document.getElementById("appDescription").value;
+        apps.push({ name, link, description });
+        renderCards(apps);
+        appModal.hide();
+      });
+
+      // Add/Edit Modal logic
+      const appModal = new bootstrap.Modal(document.getElementById('appModal'));
+      const appForm = document.getElementById('appForm');
+      let isEditMode = false;
+      let editIndex = null;
+
+      document.getElementById('addAppBtn').addEventListener('click', function() {
+        isEditMode = false;
+        appForm.reset();
+        document.getElementById('appModalLabel').innerText = 'Add App';
+        appModal.show();
+      });
+
+      appForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(appForm);
+        const appData = {
+          name: formData.get('appName'),
+          link: formData.get('appLink'),
+          description: formData.get('appDescription')
+        };
+
+        if (isEditMode) {
+          apps[editIndex] = appData;
+        } else {
+          apps.push(appData);
+        }
+
+        renderCards(apps);
+        appModal.hide();
+      });
+
+      window.editApp = function(index) {
+        isEditMode = true;
+        editIndex = index;
+        const app = apps[index];
+        document.getElementById('appName').value = app.name;
+        document.getElementById('appLink').value = app.link;
+        document.getElementById('appDescription').value = app.description;
+        document.getElementById('appModalLabel').innerText = 'Edit App';
+        appModal.show();
+      }
+
+      function showSection(sectionId) {
+        document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+        document.getElementById(sectionId).classList.add('active');
+      }
+    </script>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal fade" id="appModal" tabindex="-1" aria-labelledby="appModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form id="appForm" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="appModalLabel">Add App</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="appName" class="form-label">App Name</label>
+              <input type="text" class="form-control" id="appName" required />
+            </div>
+            <div class="mb-3">
+              <label for="appLink" class="form-label">Link</label>
+              <input type="url" class="form-control" id="appLink" required />
+            </div>
+            <div class="mb-3">
+              <label for="appDescription" class="form-label">Description</label>
+              <textarea class="form-control" id="appDescription" rows="3" required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </body>
 </html>

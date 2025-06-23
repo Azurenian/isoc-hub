@@ -23,8 +23,7 @@
   ></div>
 
   <div class="container" style="max-width: 420px; margin-top: 40px">
-    <h1 class="text-center mb-4">⚙️ Settings</h1>
-    <h2 class="mb-4">Google Sheet Connection</h2>
+    <h2 class="mb-4">⚙️ Google Sheet Connection</h2>
 
     <div class="mb-3">
       <label for="spreadsheet-id-input" class="form-label"
@@ -57,84 +56,91 @@
   </div>
 
   <script>
-    function showNotification(message, color = "#28a745") {
-      const bar = document.getElementById("notification-bar");
-      bar.textContent = message;
-      bar.style.background = color;
-      bar.style.display = "block";
-      // Smoothly show
-      setTimeout(() => bar.classList.add("show"), 10);
-      // Hide after 3 seconds
-      setTimeout(() => {
-        bar.classList.remove("show");
-        setTimeout(() => {
-          bar.style.display = "none";
-        }, 400); // match transition duration
-      }, 3000); // <-- 3 seconds
-    }
-
-    function validateInputs() {
-      const id = document.getElementById("spreadsheet-id-input").value.trim();
-      const name = document.getElementById("sheet-name-input").value.trim();
-      document.getElementById("save-sheet-info-btn").disabled = !(id && name);
-    }
-
-    document
-      .getElementById("spreadsheet-id-input")
-      .addEventListener("input", validateInputs);
-    document
-      .getElementById("sheet-name-input")
-      .addEventListener("input", validateInputs);
-
-    function saveSheetInfo() {
-      const idInput = document.getElementById("spreadsheet-id-input");
-      const nameInput = document.getElementById("sheet-name-input");
-      let id = idInput.value.trim();
-      let name = nameInput.value.trim();
-
-      // Regex to extract ID from Google Sheets URL
-      const match = id.match(/\/d\/([a-zA-Z0-9-_]+)/);
-      if (match) id = match[1];
-
-      if (!/^[a-zA-Z0-9-_]{30,}$/.test(id)) {
-        showNotification(
-          "Please enter a valid Google Sheets link or ID.",
-          "#dc3545"
-        );
-        return;
-      }
-      if (!name) {
-        showNotification("Please enter a Sheet Name.", "#dc3545");
-        return;
-      }
-
-      idInput.value = "";
-      nameInput.value = "";
-      validateInputs();
-      showNotification("Saving...");
-
-      google.script.run
-        .withSuccessHandler(function () {
-          showNotification("Saved!");
-        })
-        .withFailureHandler(function (err) {
-          showNotification("Error: " + err.message, "#dc3545");
-        })
-        .saveSheetInfo(name, id); // Call new backend function
-    }
-
-    document.getElementById("save-sheet-info-btn").onclick = saveSheetInfo;
-
-    // Optional: allow Enter key to trigger save if both fields filled
-    document
-      .getElementById("sheet-name-input")
-      .addEventListener("keydown", function (e) {
-        if (
-          e.key === "Enter" &&
-          !document.getElementById("save-sheet-info-btn").disabled
-        ) {
-          saveSheetInfo();
+        function showNotification(message, color = "#28a745") {
+          const bar = document.getElementById("notification-bar");
+          bar.textContent = message;
+          bar.style.background = color;
+          bar.style.display = "block";
+          // Smoothly show
+          setTimeout(() => bar.classList.add("show"), 10);
+          // Hide after 3 seconds
+          setTimeout(() => {
+            bar.classList.remove("show");
+            setTimeout(() => {
+              bar.style.display = "none";
+            }, 400); // match transition duration
+          }, 3000); // <-- 3 seconds
         }
-      });
+
+        function validateInputs() {
+          const id = document.getElementById("spreadsheet-id-input").value.trim();
+          const name = document.getElementById("sheet-name-input").value.trim();
+          document.getElementById("save-sheet-info-btn").disabled = !(id && name);
+        }
+
+        document
+          .getElementById("spreadsheet-id-input")
+          .addEventListener("input", validateInputs);
+        document
+          .getElementById("sheet-name-input")
+          .addEventListener("input", validateInputs);
+
+        function saveSheetInfo() {
+          const idInput = document.getElementById("spreadsheet-id-input");
+          const nameInput = document.getElementById("sheet-name-input");
+          let id = idInput.value.trim();
+          let name = nameInput.value.trim();
+
+          // Regex to extract ID from Google Sheets URL
+          const match = id.match(/\/d\/([a-zA-Z0-9-_]+)/);
+          if (match) id = match[1];
+
+          if (!/^[a-zA-Z0-9-_]{30,}$/.test(id)) {
+            showNotification(
+              "Please enter a valid Google Sheets link or ID.",
+              "#dc3545"
+            );
+    <<<<<<< HEAD
+    =======
+            return;
+          }
+          if (!name) {
+            showNotification("Please enter a Sheet Name.", "#dc3545");
+    >>>>>>> b5955e0340085a734808bb8e1a69df9acaf91811
+            return;
+          }
+          if (!name) {
+            showNotification("Please enter a Sheet Name.", "#dc3545");
+            return;
+          }
+
+          idInput.value = "";
+          nameInput.value = "";
+          validateInputs();
+          showNotification("Saving...");
+
+          google.script.run
+            .withSuccessHandler(function () {
+              showNotification("Saved!");
+            })
+            .withFailureHandler(function (err) {
+              showNotification("Error: " + err.message, "#dc3545");
+            })
+            .saveSheetInfo(name, id); // Call new backend function
+        }
+
+        document.getElementById("save-sheet-info-btn").onclick = saveSheetInfo;
+
+        // Optional: allow Enter key to trigger save if both fields filled
+        document
+          .getElementById("sheet-name-input")
+          .addEventListener("keydown", function (e) {
+            if (
+              e.key === "Enter" &&
+              !document.getElementById("save-sheet-info-btn").disabled
+            ) {
+              saveSheetInfo();
+            }
+          });
   </script>
 </div>

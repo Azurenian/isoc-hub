@@ -1,39 +1,45 @@
 // Replace with your actual database spreadsheet ID
-const SPREADSHEET_ID = "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo";
-const SHEET_NAME = "Sheet1"; // Change if your sheet name is different
+const DATABASE_SPREADSHEET_ID = "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo";
+const DATABASE_SHEET_NAME = "Sheet1"; // Change if your sheet name is different
 
-function findRowBySpreadsheetId(id) {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(SHEET_NAME);
-  const data = sheet.getDataRange().getValues();
-  for (let i = 1; i < data.length; i++) {
-    // skip header
-    if (String(data[i][1]).trim() === id.trim()) {
+// Search by Sheet Name (column A)
+function findRowBySheetName(sheetName) {
+  var ss = SpreadsheetApp.openById(DATABASE_SPREADSHEET_ID);
+  var sheet = ss.getSheets()[0];
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (
+      String(data[i][0]).trim().toLowerCase() === sheetName.trim().toLowerCase()
+    ) {
       return {
-        id: data[i][0],
-        link: data[i][1],
-        description: data[i][2],
+        id: data[i][0], // A cell
+        spreadsheetId: data[i][1], // B cell
+        description: data[i][2], // C cell
       };
     }
   }
-  return null;
+  throw new Error("Sheet name not found.");
 }
 
-function findRowBySheetName(name) {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(SHEET_NAME);
-  const data = sheet.getDataRange().getValues();
-  for (let i = 1; i < data.length; i++) {
-    // skip header
-    if (String(data[i][0]).trim().toLowerCase() === name.trim().toLowerCase()) {
+// Search by Spreadsheet ID or link (column B)
+function findRowBySpreadsheetId(spreadsheetId) {
+  var ss = SpreadsheetApp.openById(DATABASE_SPREADSHEET_ID);
+  var sheet = ss.getSheets()[0];
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    // Match either the full link or just the ID
+    if (
+      String(data[i][1]).trim() === spreadsheetId.trim() ||
+      String(data[i][1]).includes(spreadsheetId.trim())
+    ) {
       return {
-        id: data[i][0],
-        link: data[i][1],
-        description: data[i][2],
+        id: data[i][0], // A cell
+        spreadsheetId: data[i][1], // B cell
+        description: data[i][2], // C cell
       };
     }
   }
-  return null;
+  throw new Error("Spreadsheet ID not found.");
 }
 
 function saveSpreadsheetId(id) {

@@ -204,6 +204,27 @@
         document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
         document.getElementById(sectionId).classList.add('active');
       }
+
+      document.getElementById('seeRecentCommentBtn').onclick = function() {
+        const cardId = document.getElementById('commentCardId').value;
+        // Replace this with your backend call to fetch the most recent comment for the card
+        google.script.run
+          .withSuccessHandler(function(comments) {
+            if (comments && comments.length > 0) {
+              const recent = comments[comments.length - 1];
+              document.getElementById('recentCommentResult').innerHTML = `
+                <div class="border rounded p-2 bg-light">
+                  <div class="fw-semibold" style="font-size:0.97em;">${recent.name}</div>
+                  <div style="font-size:0.98em;">${recent.comment}</div>
+                  <div class="text-muted" style="font-size:0.85em;">${recent.date || ''}</div>
+                </div>
+              `;
+            } else {
+              document.getElementById('recentCommentResult').innerHTML = `<div class="text-muted">No comments yet.</div>`;
+            }
+          })
+          .getCommentsForCard(cardId); // This should return an array of comments for the card
+      };
     </script>
 
     <!-- Add/Edit Modal -->
@@ -227,6 +248,12 @@
               <label for="appDescription" class="form-label">Description</label>
               <textarea class="form-control" id="appDescription" rows="3" required></textarea>
             </div>
+            <div class="d-grid mt-2">
+              <button type="button" id="seeRecentCommentBtn" class="btn btn-outline-primary">
+                <i class="bi bi-clock-history"></i> See recent comment
+              </button>
+            </div>
+            <div id="recentCommentResult" class="mt-2"></div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

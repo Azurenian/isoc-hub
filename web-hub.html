@@ -263,6 +263,24 @@
       opacity: 0;
     }
   }
+
+  #commentList {
+    transition: background 0.3s, color 0.3s;
+  }
+  #commentList .comment-item {
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--bs-border-color, #e5e7eb);
+    background: var(--bs-light, #f8f9fa);
+    color: var(--bs-body-color, #212529);
+  }
+  body.dark-mode #commentList .comment-item,
+  [data-bs-theme="dark"] #commentList .comment-item {
+    background: #23272f;
+    color: #f3f4f6;
+    border-color: #343a40;
+  }
 </style>
 
 <!-- Delete Confirmation Modal -->
@@ -320,6 +338,14 @@
       </div>
       <div class="modal-body">
         <input type="hidden" id="commentCardId" />
+        <button
+          type="button"
+          id="toggleCommentsBtn"
+          class="btn btn-outline-secondary mb-3 w-100"
+        >
+          <i class="bi bi-chat-dots"></i> View Comments
+        </button>
+        <div id="commentList" class="mb-3" style="display: none"></div>
         <div class="mb-3">
           <label for="commentName" class="form-label">Your Name</label>
           <input type="text" class="form-control" id="commentName" required />
@@ -387,7 +413,9 @@
         <div class="card h-100 shadow-sm border-0" data-index="${index}">
           <div class="card-body d-flex flex-column position-relative">
             <!-- Circle checkbox in upper right -->
-            <input type="checkbox" class="form-check-input select-card-checkbox position-absolute top-0 end-0 mt-3 me-3" data-index="${index}" style="width: 1.5em; height: 1.5em; border-radius: 50%; border: 2px solid #6366f1; box-shadow: 0 1px 4px rgba(0,0,0,0.07);" ${window.selectedCardIndex === index ? "checked" : ""}>
+            <input type="checkbox" class="form-check-input select-card-checkbox position-absolute top-0 end-0 mt-3 me-3" data-index="${index}" style="width: 1.5em; height: 1.5em; border-radius: 50%; border: 2px solid #6366f1; box-shadow: 0 1px 4px rgba(0,0,0,0.07);" ${
+        window.selectedCardIndex === index ? "checked" : ""
+      }>
             <h5 class="card-title fw-semibold">${app.name}</h5>
             <p class="card-text flex-grow-1">${app.description}</p>
             <a href="${app.link}" target="_blank" rel="noopener noreferrer"
@@ -395,7 +423,9 @@
               <i class="bi bi-box-arrow-up-right"></i>
               <span>Open Link</span>
             </a>
-            <button type="button" class="hub-btn hub-btn-comment comment-card-btn" data-index="${index}" data-card-id="${app.name}">
+            <button type="button" class="hub-btn hub-btn-comment comment-card-btn" data-index="${index}" data-card-id="${
+        app.name
+      }">
               <i class="bi bi-chat-dots"></i>
               <span>Comment</span>
             </button>
@@ -452,15 +482,66 @@
     document.getElementById("loading-spinner").style.display = "none";
   }
 
+  // Toggle comments visibility and fetch if needed
+  function setupToggleComments() {
+    const btn = document.getElementById("toggleCommentsBtn");
+    const listDiv = document.getElementById("commentList");
+    let loadedCardId = null;
+
+    btn.onclick = function () {
+      const cardId = document.getElementById("commentCardId").value;
+      if (listDiv.style.display === "none") {
+        btn.innerHTML = '<i class="bi bi-chat-dots"></i> Hide Comments';
+        listDiv.innerHTML = '<div class="text-muted">Loading comments...</div>';
+        listDiv.style.display = "block";
+        // Only fetch if not already loaded for this card
+        if (loadedCardId !== cardId) {
+          google.script.run
+            .withSuccessHandler(function (comments) {
+              renderCommentList(comments);
+              loadedCardId = cardId;
+            })
+            .getCommentsForCard(cardId);
+        }
+      } else {
+        btn.innerHTML = '<i class="bi bi-chat-dots"></i> View Comments';
+        listDiv.style.display = "none";
+      }
+    };
+  }
+
+  // Update addCommentButtonListeners to reset toggle state
   function addCommentButtonListeners() {
     document.querySelectorAll(".comment-card-btn").forEach((btn) => {
       btn.onclick = function () {
         const cardId = btn.getAttribute("data-card-id");
         document.getElementById("commentCardId").value = cardId;
         document.getElementById("commentForm").reset();
+        // Reset comments view
+        document.getElementById("commentList").style.display = "none";
+        document.getElementById("toggleCommentsBtn").innerHTML =
+          '<i class="bi bi-chat-dots"></i> View Comments';
         commentModal.show();
       };
     });
+  }
+
+  // Helper to render comments
+  function renderCommentList(comments) {
+    const listDiv = document.getElementById("commentList");
+    if (!comments || comments.length === 0) {
+      listDiv.innerHTML = '<div class="text-muted">No comments yet.</div>';
+      return;
+    }
+    listDiv.innerHTML = comments
+      .map(
+        (c) =>
+          `<div class="comment-item">
+          <div class="fw-semibold" style="font-size:0.97em;">${c.name}</div>
+          <div style="font-size:0.98em;">${c.comment}</div>
+        </div>`
+      )
+      .join("");
   }
 
   // Add this helper function
@@ -473,7 +554,9 @@
       <div class="card h-100 shadow-sm border-0" data-index="${index}">
         <div class="card-body d-flex flex-column position-relative">
           <!-- Circle checkbox in upper right -->
-          <input type="checkbox" class="form-check-input select-card-checkbox position-absolute top-0 end-0 mt-3 me-3" data-index="${index}" style="width: 1.5em; height: 1.5em; border-radius: 50%; border: 2px solid #6366f1; box-shadow: 0 1px 4px rgba(0,0,0,0.07);" ${window.selectedCardIndex === index ? "checked" : ""}>
+          <input type="checkbox" class="form-check-input select-card-checkbox position-absolute top-0 end-0 mt-3 me-3" data-index="${index}" style="width: 1.5em; height: 1.5em; border-radius: 50%; border: 2px solid #6366f1; box-shadow: 0 1px 4px rgba(0,0,0,0.07);" ${
+      window.selectedCardIndex === index ? "checked" : ""
+    }>
           <h5 class="card-title fw-semibold">${app.name}</h5>
           <p class="card-text flex-grow-1">${app.description}</p>
           <a href="${app.link}" target="_blank" rel="noopener noreferrer"
@@ -481,7 +564,9 @@
             <i class="bi bi-box-arrow-up-right"></i>
             <span>Open Link</span>
           </a>
-          <button type="button" class="hub-btn hub-btn-comment comment-card-btn" data-index="${index}" data-card-id="${app.name}">
+          <button type="button" class="hub-btn hub-btn-comment comment-card-btn" data-index="${index}" data-card-id="${
+      app.name
+    }">
             <i class="bi bi-chat-dots"></i>
             <span>Comment</span>
           </button>
@@ -489,39 +574,21 @@
       </div>
     `;
     if (colDiv) {
-      colDiv.innerHTML = cardHTML; // Only update, do not add new for edit
-    } else if (index === spreadsheetData.length - 1) {
-      // Only add new card if it's a new entry (add mode)
-      colDiv = document.createElement("div");
-      colDiv.className = "col-md-4 mb-3";
-      colDiv.setAttribute("data-index", index);
-      colDiv.innerHTML = cardHTML;
-      container.appendChild(colDiv);
+      // Update existing card
+      colDiv.outerHTML = cardHTML;
+    } else {
+      // Add new card
+      const newColDiv = document.createElement("div");
+      newColDiv.className = "col-md-4 mb-3";
+      newColDiv.innerHTML = cardHTML;
+      container.appendChild(newColDiv);
     }
   }
 
   // Bootstrap modal instance
   let appModal = null;
   let deleteConfirmModal = null;
-  let commentModal = null;
-  let pendingDeleteIndex = null;
-
-  document.addEventListener("DOMContentLoaded", function () {
-    appModal = new bootstrap.Modal(document.getElementById("appModal"));
-    deleteConfirmModal = new bootstrap.Modal(
-      document.getElementById("deleteConfirmModal")
-    );
-    commentModal = new bootstrap.Modal(document.getElementById("commentModal"));
-
-    // Add Button
-    document
-      .querySelector('.btn-success[title="Add"]')
-      .addEventListener("click", function () {
-        document.getElementById("appModalLabel").textContent = "Add Web App";
-        document.getElementById("appForm").reset();
-        document.getElementById("editIndex").value = "";
-        appModal.show();
-      });
+  let commentModal
 
     // Edit Button
     document
@@ -741,62 +808,7 @@
             reject(new Error("Imgur upload failed: " + result.message));
           }
         })
-        .catch((error) =>
-          reject(new Error("Imgur upload error: " + error.message))
-        );
+        .catch((err) => reject(new Error("Imgur upload error: " + err.message)));
     });
   }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    // Apply futuristic styling to buttons
-    const openLinkBtns = document.querySelectorAll(".btn-outline-primary");
-    const selectBtns = document.querySelectorAll(".btn-outline-secondary");
-    const commentBtns = document.querySelectorAll(".btn-outline-info");
-
-    openLinkBtns.forEach((btn) => {
-      btn.classList.add("btn-futuristic", "btn-link-futuristic");
-      btn.innerHTML = `<i class="bi bi-box-arrow-up-right"></i> Open Link`;
-    });
-
-    selectBtns.forEach((btn) => {
-      btn.classList.add("btn-futuristic", "btn-select-futuristic");
-      btn.innerHTML = `<i class="bi bi-check-circle"></i> Select`;
-
-      // Handle selection visual feedback
-      btn.addEventListener("click", function () {
-        const wasSelected = this.classList.contains("selected");
-        document.querySelectorAll(".select-card-btn").forEach((b) => {
-          b.classList.remove("selected");
-        });
-        if (!wasSelected) {
-          this.classList.add("selected");
-        }
-      });
-    });
-
-    commentBtns.forEach((btn) => {
-      btn.classList.add("btn-futuristic", "btn-comment-futuristic");
-      btn.innerHTML = `<i class="bi bi-chat-dots"></i> Comment`;
-    });
-
-    // Add ripple effect to all buttons
-    document.querySelectorAll(".btn-futuristic").forEach((button) => {
-      button.addEventListener("click", function (e) {
-        let ripple = document.createElement("span");
-        ripple.classList.add("ripple");
-        this.appendChild(ripple);
-
-        // Position the ripple
-        let x = e.clientX - this.getBoundingClientRect().left;
-        let y = e.clientY - this.getBoundingClientRect().top;
-
-        ripple.style.left = x + "px";
-        ripple.style.top = y + "px";
-
-        setTimeout(() => {
-          ripple.remove();
-        }, 600);
-      });
-    });
-  });
 </script>

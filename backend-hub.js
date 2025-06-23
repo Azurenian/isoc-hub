@@ -77,3 +77,24 @@ function getWebAppByIndex(index) {
     photo: row[3],
   };
 }
+
+/**
+ * Get all comments for a given cardId from the Comments sheet.
+ * @param {string} cardId
+ * @return {Array<{name: string, comment: string}>}
+ */
+function getCommentsForCard(cardId) {
+  var ss = SpreadsheetApp.openById(
+    "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
+  );
+  var sheet = ss.getSheetByName("Comments");
+  if (!sheet) return [];
+  var data = sheet.getDataRange().getValues();
+  var comments = [];
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][2]) === String(cardId)) {
+      comments.push({ name: data[i][0], comment: data[i][1] });
+    }
+  }
+  return comments;
+}

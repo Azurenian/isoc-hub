@@ -424,7 +424,7 @@
         google.script.run
           .withSuccessHandler(function () {
             showHubNotification("Added successfully!");
-            loadWebApps();
+            loadWebApps(); // This refreshes the list after adding
           })
           .addWebAppToSheet(name, link, description, photo);
       } else {

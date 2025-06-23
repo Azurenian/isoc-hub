@@ -388,14 +388,18 @@
           <div class="card-body d-flex flex-column">
             <h5 class="card-title fw-semibold">${app.name}</h5>
             <p class="card-text flex-grow-1">${app.description}</p>
-            <a href="${app.link}" class="btn btn-outline-primary w-100 mt-auto mb-2" target="_blank">
-              <span class="me-1"><i class="bi bi-box-arrow-up-right"></i></span>Open Link
+            <a href="${app.link}" target="_blank" rel="noopener noreferrer"
+               class="hub-animated-btn mb-2" style="text-decoration:none;">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span><i class="bi bi-box-arrow-up-right"></i> Open Link</span>
             </a>
-            <button class="btn btn-outline-secondary w-100 select-card-btn" data-index="${index}">
-              <i class="bi bi-check-circle"></i> Select
+            <button type="button" class="hub-animated-btn select-card-btn mb-2" data-index="${index}">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span><i class="bi bi-check-circle"></i> Select</span>
             </button>
-            <button class="btn btn-outline-info w-100 mt-2 comment-card-btn" data-index="${index}" data-card-id="${app.name}">
-              <i class="bi bi-chat-dots"></i> Comment
+            <button type="button" class="hub-animated-btn comment-card-btn" data-index="${index}" data-card-id="${app.name}">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span><i class="bi bi-chat-dots"></i> Comment</span>
             </button>
           </div>
         </div>
@@ -449,14 +453,18 @@
         <div class="card-body d-flex flex-column">
           <h5 class="card-title fw-semibold">${app.name}</h5>
           <p class="card-text flex-grow-1">${app.description}</p>
-          <a href="${app.link}" class="btn btn-outline-primary w-100 mt-auto mb-2" target="_blank">
-            <span class="me-1"><i class="bi bi-box-arrow-up-right"></i></span>Open Link
+          <a href="${app.link}" target="_blank" rel="noopener noreferrer"
+             class="hub-animated-btn mb-2" style="text-decoration:none;">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span><i class="bi bi-box-arrow-up-right"></i> Open Link</span>
           </a>
-          <button class="btn btn-outline-secondary w-100 select-card-btn" data-index="${index}">
-            <i class="bi bi-check-circle"></i> Select
+          <button type="button" class="hub-animated-btn select-card-btn mb-2" data-index="${index}">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span><i class="bi bi-check-circle"></i> Select</span>
           </button>
-          <button class="btn btn-outline-info w-100 mt-2 comment-card-btn" data-index="${index}" data-card-id="${app.name}">
-            <i class="bi bi-chat-dots"></i> Comment
+          <button type="button" class="hub-animated-btn comment-card-btn" data-index="${index}" data-card-id="${app.name}">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span><i class="bi bi-chat-dots"></i> Comment</span>
           </button>
         </div>
       </div>

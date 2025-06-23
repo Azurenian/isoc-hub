@@ -385,7 +385,9 @@
       card.className = "col-md-4 mb-3";
       card.innerHTML = `
         <div class="card h-100 shadow-sm border-0" data-index="${index}">
-          <div class="card-body d-flex flex-column">
+          <div class="card-body d-flex flex-column position-relative">
+            <!-- Circle checkbox in upper right -->
+            <input type="checkbox" class="form-check-input select-card-checkbox position-absolute top-0 end-0 mt-3 me-3" data-index="${index}" style="width: 1.5em; height: 1.5em; border-radius: 50%; border: 2px solid #6366f1; box-shadow: 0 1px 4px rgba(0,0,0,0.07);" ${window.selectedCardIndex === index ? "checked" : ""}>
             <h5 class="card-title fw-semibold">${app.name}</h5>
             <p class="card-text flex-grow-1">${app.description}</p>
             <a href="${app.link}" target="_blank" rel="noopener noreferrer"
@@ -393,10 +395,6 @@
               <i class="bi bi-box-arrow-up-right"></i>
               <span>Open Link</span>
             </a>
-            <button type="button" class="hub-btn hub-btn-select mb-2 select-card-btn" data-index="${index}">
-              <i class="bi bi-check-circle"></i>
-              <span>Select</span>
-            </button>
             <button type="button" class="hub-btn hub-btn-comment comment-card-btn" data-index="${index}" data-card-id="${app.name}">
               <i class="bi bi-chat-dots"></i>
               <span>Comment</span>
@@ -426,6 +424,29 @@
       };
     });
 
+    document.querySelectorAll(".select-card-checkbox").forEach((checkbox) => {
+      checkbox.onchange = function () {
+        const index = parseInt(this.getAttribute("data-index"));
+        if (this.checked) {
+          // Uncheck all others
+          document.querySelectorAll(".select-card-checkbox").forEach((cb) => {
+            if (cb !== this) cb.checked = false;
+          });
+          window.selectedCardIndex = index;
+          // Optional: highlight card
+          document.querySelectorAll(".card.h-100").forEach((c, i) => {
+            c.classList.toggle("border-primary", i === index);
+            c.classList.toggle("shadow", i === index);
+          });
+        } else {
+          window.selectedCardIndex = undefined;
+          document.querySelectorAll(".card.h-100").forEach((c) => {
+            c.classList.remove("border-primary", "shadow");
+          });
+        }
+      };
+    });
+
     addCommentButtonListeners();
     container.style.opacity = 1;
     document.getElementById("loading-spinner").style.display = "none";
@@ -450,7 +471,9 @@
     );
     const cardHTML = `
       <div class="card h-100 shadow-sm border-0" data-index="${index}">
-        <div class="card-body d-flex flex-column">
+        <div class="card-body d-flex flex-column position-relative">
+          <!-- Circle checkbox in upper right -->
+          <input type="checkbox" class="form-check-input select-card-checkbox position-absolute top-0 end-0 mt-3 me-3" data-index="${index}" style="width: 1.5em; height: 1.5em; border-radius: 50%; border: 2px solid #6366f1; box-shadow: 0 1px 4px rgba(0,0,0,0.07);" ${window.selectedCardIndex === index ? "checked" : ""}>
           <h5 class="card-title fw-semibold">${app.name}</h5>
           <p class="card-text flex-grow-1">${app.description}</p>
           <a href="${app.link}" target="_blank" rel="noopener noreferrer"
@@ -458,10 +481,6 @@
             <i class="bi bi-box-arrow-up-right"></i>
             <span>Open Link</span>
           </a>
-          <button type="button" class="hub-btn hub-btn-select mb-2 select-card-btn" data-index="${index}">
-            <i class="bi bi-check-circle"></i>
-            <span>Select</span>
-          </button>
           <button type="button" class="hub-btn hub-btn-comment comment-card-btn" data-index="${index}" data-card-id="${app.name}">
             <i class="bi bi-chat-dots"></i>
             <span>Comment</span>

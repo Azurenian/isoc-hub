@@ -385,7 +385,20 @@
       card.className = "col-md-4 mb-3";
       card.innerHTML = `
         <div class="card h-100 shadow-sm border-0" data-index="${index}">
-          <div class="card-body d-flex flex-column">
+          <div class="card-body d-flex flex-column position-relative">
+            <!-- Three-dot menu in upper right -->
+            <div class="dropdown card-menu-dropdown position-absolute top-0 end-0 mt-2 me-2">
+              <button class="btn btn-sm btn-light card-menu-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background:transparent;border:none;">
+                <i class="bi bi-three-dots-vertical fs-5"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end p-0 m-0">
+                <li>
+                  <button type="button" class="dropdown-item select-card-btn" data-index="${index}">
+                    <i class="bi bi-check-circle"></i> Select
+                  </button>
+                </li>
+              </ul>
+            </div>
             <h5 class="card-title fw-semibold">${app.name}</h5>
             <p class="card-text flex-grow-1">${app.description}</p>
             <a href="${app.link}" target="_blank" rel="noopener noreferrer"
@@ -393,10 +406,6 @@
               <i class="bi bi-box-arrow-up-right"></i>
               <span>Open Link</span>
             </a>
-            <button type="button" class="hub-btn hub-btn-select mb-2 select-card-btn" data-index="${index}">
-              <i class="bi bi-check-circle"></i>
-              <span>Select</span>
-            </button>
             <button type="button" class="hub-btn hub-btn-comment comment-card-btn" data-index="${index}" data-card-id="${app.name}">
               <i class="bi bi-chat-dots"></i>
               <span>Comment</span>
@@ -450,7 +459,20 @@
     );
     const cardHTML = `
       <div class="card h-100 shadow-sm border-0" data-index="${index}">
-        <div class="card-body d-flex flex-column">
+        <div class="card-body d-flex flex-column position-relative">
+          <!-- Three-dot menu in upper right -->
+          <div class="dropdown card-menu-dropdown position-absolute top-0 end-0 mt-2 me-2">
+            <button class="btn btn-sm btn-light card-menu-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background:transparent;border:none;">
+              <i class="bi bi-three-dots-vertical fs-5"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end p-0 m-0">
+              <li>
+                <button type="button" class="dropdown-item select-card-btn" data-index="${index}">
+                  <i class="bi bi-check-circle"></i> Select
+                </button>
+              </li>
+            </ul>
+          </div>
           <h5 class="card-title fw-semibold">${app.name}</h5>
           <p class="card-text flex-grow-1">${app.description}</p>
           <a href="${app.link}" target="_blank" rel="noopener noreferrer"
@@ -458,10 +480,6 @@
             <i class="bi bi-box-arrow-up-right"></i>
             <span>Open Link</span>
           </a>
-          <button type="button" class="hub-btn hub-btn-select mb-2 select-card-btn" data-index="${index}">
-            <i class="bi bi-check-circle"></i>
-            <span>Select</span>
-          </button>
           <button type="button" class="hub-btn hub-btn-comment comment-card-btn" data-index="${index}" data-card-id="${app.name}">
             <i class="bi bi-chat-dots"></i>
             <span>Comment</span>

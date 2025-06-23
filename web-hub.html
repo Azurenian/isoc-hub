@@ -317,6 +317,41 @@
     });
   }
 
+  // Add this helper function
+  function addOrUpdateCard(app, index) {
+    const container = document.querySelector(".card-container");
+    let colDiv = container.querySelector(
+      `.col-md-4.mb-3[data-index="${index}"]`
+    );
+    const cardHTML = `
+      <div class="card h-100 shadow-sm border-0" data-index="${index}">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title fw-semibold">${app.name}</h5>
+          <p class="card-text flex-grow-1">${app.description}</p>
+          <a href="${app.link}" class="btn btn-outline-primary w-100 mt-auto mb-2" target="_blank">
+            <span class="me-1"><i class="bi bi-box-arrow-up-right"></i></span>Open Link
+          </a>
+          <button class="btn btn-outline-secondary w-100 select-card-btn" data-index="${index}">
+            <i class="bi bi-check-circle"></i> Select
+          </button>
+          <button class="btn btn-outline-info w-100 mt-2 comment-card-btn" data-index="${index}" data-card-id="${app.name}">
+            <i class="bi bi-chat-dots"></i> Comment
+          </button>
+        </div>
+      </div>
+    `;
+    if (colDiv) {
+      colDiv.innerHTML = cardHTML; // Only update, do not add new for edit
+    } else if (index === spreadsheetData.length - 1) {
+      // Only add new card if it's a new entry (add mode)
+      colDiv = document.createElement("div");
+      colDiv.className = "col-md-4 mb-3";
+      colDiv.setAttribute("data-index", index);
+      colDiv.innerHTML = cardHTML;
+      container.appendChild(colDiv);
+    }
+  }
+
   // Bootstrap modal instance
   let appModal = null;
   let deleteConfirmModal = null;
@@ -377,7 +412,19 @@
         google.script.run
           .withSuccessHandler(function () {
             showHubNotification("Web App deleted successfully!");
-            loadWebApps();
+            // Remove from spreadsheetData
+            spreadsheetData.splice(pendingDeleteIndex, 1);
+            // Remove card from DOM
+            const card = document.querySelector(
+              `.card-container [data-index="${pendingDeleteIndex}"]`
+            );
+            if (card) card.remove();
+            // Re-index remaining cards
+            document
+              .querySelectorAll(".card-container [data-index]")
+              .forEach((el, idx) => {
+                el.setAttribute("data-index", idx);
+              });
             window.selectedCardIndex = undefined;
           })
           .deleteWebAppFromSheet(pendingDeleteIndex);
@@ -406,10 +453,10 @@
       let photo =
         preview.src && preview.style.display !== "none" ? preview.src : "";
 
-      // Check for duplicate name or link (case-insensitive)
+      // Fix: Proper duplicate check
       const duplicate = spreadsheetData.some(
         (app, idx) =>
-          (editIndex === "" || idx != editIndex) &&
+          (editIndex === "" || idx != Number(editIndex)) &&
           (app.name.trim().toLowerCase() === name.toLowerCase() ||
             app.link.trim() === link)
       );
@@ -420,19 +467,49 @@
       }
 
       if (editIndex === "") {
-        // Add mode: send data to spreadsheet
+        // Add mode
         google.script.run
-          .withSuccessHandler(function () {
+          .withSuccessHandler(function (data) {
             showHubNotification("Added successfully!");
-            loadWebApps(); // This refreshes the list after adding
+            spreadsheetData.push(data);
+            addOrUpdateCard(data, spreadsheetData.length - 1);
+            addCommentButtonListeners();
+            document.querySelector(".card-container").style.opacity = 1;
+            document.getElementById("loading-spinner").style.display = "none";
           })
           .addWebAppToSheet(name, link, description, photo);
       } else {
-        // Edit mode: update spreadsheet
+        // Edit mode
         google.script.run
           .withSuccessHandler(function () {
             showHubNotification("Updated successfully!");
-            loadWebApps();
+            spreadsheetData[editIndex] = { name, link, description, photo };
+            addOrUpdateCard({ name, link, description, photo }, editIndex);
+
+            // Re-attach select button event for the updated card
+            const selectBtn = document.querySelector(
+              `.col-md-4.mb-3[data-index="${editIndex}"] .select-card-btn`
+            );
+            if (selectBtn) {
+              selectBtn.onclick = function () {
+                const cardDiv = selectBtn.closest(".card.h-100");
+                const index = parseInt(selectBtn.getAttribute("data-index"));
+                if (window.selectedCardIndex === index) {
+                  cardDiv.classList.remove("border-primary", "shadow");
+                  window.selectedCardIndex = undefined;
+                } else {
+                  document
+                    .querySelectorAll(".card.h-100")
+                    .forEach((c) =>
+                      c.classList.remove("border-primary", "shadow")
+                    );
+                  cardDiv.classList.add("border-primary", "shadow");
+                  window.selectedCardIndex = index;
+                }
+              };
+            }
+
+            addCommentButtonListeners();
             window.selectedCardIndex = undefined;
           })
           .editWebAppInSheet(editIndex, name, link, description, photo);
@@ -549,14 +626,12 @@
           if (result.success) {
             resolve(result.data.link);
           } else {
-            reject(new Error("Failed to upload image"));
+            reject(new Error("Imgur upload failed: " + result.message));
           }
         })
-        .catch((error) => reject(error));
+        .catch((error) =>
+          reject(new Error("Imgur upload error: " + error.message))
+        );
     });
   }
-
-  // Then modify your form submit handler to use this function
-  // Instead of storing base64 data directly
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

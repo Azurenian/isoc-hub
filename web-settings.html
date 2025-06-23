@@ -18,145 +18,147 @@
     "
   ></div>
 
-  <div class="container" style="max-width: 1100px; margin-top: 40px">
-    <h2 class="mb-4">Google Sheet Connection</h2>
+  <div class="container-fluid" style="margin-top: 40px;">
+    <div class="card shadow-sm w-100" style="border-radius: 12px;">
+      <div class="card-body px-4 py-4">
+        <h2 class="card-title mb-4" style="font-size: 2rem;">Google Sheet Connection</h2>
 
-    <div class="mb-3">
-      <label for="spreadsheet-id-input" class="form-label"
-        >Spreadsheet ID</label
-      >
-      <input
-        type="text"
-        class="form-control"
-        id="spreadsheet-id-input"
-        placeholder="Enter Spreadsheet ID"
-      />
-      <button
-        id="search-by-id-btn"
-        class="btn btn-primary w-100 mt-2"
-        type="button"
-      >
-        Search by Spreadsheet ID
-      </button>
-    </div>
-    <div class="mb-3">
-      <label for="sheet-name-input" class="form-label">Sheet Name</label>
-      <input
-        type="text"
-        class="form-control"
-        id="sheet-name-input"
-        placeholder="Enter Sheet Name"
-      />
-      <button
-        id="search-by-name-btn"
-        class="btn btn-primary w-100 mt-2"
-        type="button"
-      >
-        Search by Sheet Name
-      </button>
-    </div>
-    <div id="sheet-info-status" class="mt-2"></div>
+        <div class="mb-3">
+          <label for="spreadsheet-id-input" class="form-label">Spreadsheet ID</label>
+          <input
+            type="text"
+            class="form-control form-control-lg"
+            id="spreadsheet-id-input"
+            placeholder="Enter Spreadsheet ID"
+          />
+          <button
+            id="search-by-id-btn"
+            class="btn btn-primary w-100 mt-2 btn-lg"
+            type="button"
+          >
+            Search by Spreadsheet ID
+          </button>
+        </div>
+        <div class="mb-3">
+          <label for="sheet-name-input" class="form-label">Sheet Name</label>
+          <input
+            type="text"
+            class="form-control form-control-lg"
+            id="sheet-name-input"
+            placeholder="Enter Sheet Name"
+          />
+          <button
+            id="search-by-name-btn"
+            class="btn btn-primary w-100 mt-2 btn-lg"
+            type="button"
+          >
+            Search by Sheet Name
+          </button>
+        </div>
+        <div id="sheet-info-status" class="mt-2"></div>
 
-    <!-- Table for displaying fetched data -->
-    <div id="sheet-data-container" class="mt-4" style="display: none">
-      <h5 class="fw-semibold mb-3" style="font-size: 1.1rem; color: #222">
-        Sheet Data Overview
-      </h5>
-      <div class="table-responsive">
-        <table id="sheet-data-table" class="table table-sm">
-          <thead>
-            <tr style="background: #f8f9fa">
-              <th style="font-weight: 500; color: #333">ID</th>
-              <th style="font-weight: 500; color: #333">Link</th>
-              <th style="font-weight: 500; color: #333">Description</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <!-- Table for displaying fetched data -->
+        <div id="sheet-data-container" class="mt-4" style="display: none">
+          <h5 class="fw-semibold mb-3" style="font-size: 1.1rem; color: #222">
+            Sheet Data Overview
+          </h5>
+          <div class="table-responsive">
+            <table id="sheet-data-table" class="table table-sm">
+              <thead>
+                <tr style="background: #f8f9fa">
+                  <th style="font-weight: 500; color: #333">ID</th>
+                  <th style="font-weight: 500; color: #333">Link</th>
+                  <th style="font-weight: 500; color: #333">Description</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <script>
-    function showNotification(message, color = "#28a745") {
-      const bar = document.getElementById("notification-bar");
-      bar.textContent = message;
-      bar.style.background = color;
-      bar.style.display = "block";
-      setTimeout(() => bar.classList.add("show"), 10);
-      setTimeout(() => {
-        bar.classList.remove("show");
+    <script>
+      function showNotification(message, color = "#28a745") {
+        const bar = document.getElementById("notification-bar");
+        bar.textContent = message;
+        bar.style.background = color;
+        bar.style.display = "block";
+        setTimeout(() => bar.classList.add("show"), 10);
         setTimeout(() => {
-          bar.style.display = "none";
-        }, 400);
-      }, 3000);
-    }
-
-    function renderSingleRow(data) {
-      const container = document.getElementById("sheet-data-container");
-      const table = document.getElementById("sheet-data-table");
-      if (!data) {
-        container.style.display = "none";
-        return;
+          bar.classList.remove("show");
+          setTimeout(() => {
+            bar.style.display = "none";
+          }, 400);
+        }, 3000);
       }
-      const thead = table.querySelector("thead");
-      thead.innerHTML = "<tr><th>ID</th><th>Link</th><th>Description</th></tr>";
-      const tbody = table.querySelector("tbody");
-      tbody.innerHTML = `<tr>
-        <td>${data.id}</td>
-        <td>
-          <a href="${data.link}" target="_blank" rel="noopener" style="color:#2563eb;word-break:break-all;">
-            ${data.link}
-          </a>
-        </td>
-        <td>${data.description}</td>
-      </tr>`;
-      container.style.display = "";
-    }
 
-    function fetchById() {
-      const id = document.getElementById("spreadsheet-id-input").value.trim();
-      if (!id) {
-        showNotification("Please enter a Spreadsheet ID.", "#dc3545");
-        return;
+      function renderSingleRow(data) {
+        const container = document.getElementById("sheet-data-container");
+        const table = document.getElementById("sheet-data-table");
+        if (!data) {
+          container.style.display = "none";
+          return;
+        }
+        const thead = table.querySelector("thead");
+        thead.innerHTML = "<tr><th>ID</th><th>Link</th><th>Description</th></tr>";
+        const tbody = table.querySelector("tbody");
+        tbody.innerHTML = `<tr>
+          <td>${data.id}</td>
+          <td>
+            <a href="${data.link}" target="_blank" rel="noopener" style="color:#2563eb;word-break:break-all;">
+              ${data.link}
+            </a>
+          </td>
+          <td>${data.description}</td>
+        </tr>`;
+        container.style.display = "";
       }
-      document.getElementById("sheet-info-status").textContent = "Searching...";
-      google.script.run
-        .withSuccessHandler(function (data) {
-          document.getElementById("sheet-info-status").textContent = "";
-          renderSingleRow(data);
-        })
-        .withFailureHandler(function (err) {
-          document.getElementById("sheet-info-status").textContent =
-            "Error: " + err.message;
-          document.getElementById("sheet-data-container").style.display =
-            "none";
-        })
-        .findRowBySpreadsheetId(id);
-    }
 
-    function fetchByName() {
-      const name = document.getElementById("sheet-name-input").value.trim();
-      if (!name) {
-        showNotification("Please enter a Sheet Name.", "#dc3545");
-        return;
+      function fetchById() {
+        const id = document.getElementById("spreadsheet-id-input").value.trim();
+        if (!id) {
+          showNotification("Please enter a Spreadsheet ID.", "#dc3545");
+          return;
+        }
+        document.getElementById("sheet-info-status").textContent = "Searching...";
+        google.script.run
+          .withSuccessHandler(function (data) {
+            document.getElementById("sheet-info-status").textContent = "";
+            renderSingleRow(data);
+          })
+          .withFailureHandler(function (err) {
+            document.getElementById("sheet-info-status").textContent =
+              "Error: " + err.message;
+            document.getElementById("sheet-data-container").style.display =
+              "none";
+          })
+          .findRowBySpreadsheetId(id);
       }
-      document.getElementById("sheet-info-status").textContent = "Searching...";
-      google.script.run
-        .withSuccessHandler(function (data) {
-          document.getElementById("sheet-info-status").textContent = "";
-          renderSingleRow(data);
-        })
-        .withFailureHandler(function (err) {
-          document.getElementById("sheet-info-status").textContent =
-            "Error: " + err.message;
-          document.getElementById("sheet-data-container").style.display =
-            "none";
-        })
-        .findRowBySheetName(name); // This must match the Apps Script function name
-    }
 
-    document.getElementById("search-by-id-btn").onclick = fetchById;
-    document.getElementById("search-by-name-btn").onclick = fetchByName;
-  </script>
+      function fetchByName() {
+        const name = document.getElementById("sheet-name-input").value.trim();
+        if (!name) {
+          showNotification("Please enter a Sheet Name.", "#dc3545");
+          return;
+        }
+        document.getElementById("sheet-info-status").textContent = "Searching...";
+        google.script.run
+          .withSuccessHandler(function (data) {
+            document.getElementById("sheet-info-status").textContent = "";
+            renderSingleRow(data);
+          })
+          .withFailureHandler(function (err) {
+            document.getElementById("sheet-info-status").textContent =
+              "Error: " + err.message;
+            document.getElementById("sheet-data-container").style.display =
+              "none";
+          })
+          .findRowBySheetName(name); // This must match the Apps Script function name
+      }
+
+      document.getElementById("search-by-id-btn").onclick = fetchById;
+      document.getElementById("search-by-name-btn").onclick = fetchByName;
+    </script>
+  </div>
 </div>

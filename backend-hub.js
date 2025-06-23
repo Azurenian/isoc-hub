@@ -61,3 +61,19 @@ function loadWebApps() {
     })
     .getWebAppsFromSheet();
 }
+
+function getWebAppByIndex(index) {
+  var ss = SpreadsheetApp.openById(
+    "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
+  );
+  var sheet = ss.getSheets()[0];
+  var lastRow = sheet.getLastRow();
+  if (index < 0 || index >= lastRow - 1) return null;
+  var row = sheet.getRange(index + 2, 1, 1, 4).getValues()[0];
+  return {
+    name: row[0],
+    link: row[1],
+    description: row[2],
+    photo: row[3],
+  };
+}

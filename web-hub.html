@@ -106,9 +106,26 @@
         <!-- Upload Photo Field -->
         <div class="mb-3">
           <label for="appPhoto" class="form-label">Upload Photo</label>
-          <input type="file" class="form-control" id="appPhoto" accept="image/*" />
+          <input
+            type="file"
+            class="form-control"
+            id="appPhoto"
+            accept="image/*"
+          />
           <div class="mt-2 text-center">
-            <img id="photoPreview" src="" alt="Preview" style="max-width: 120px; max-height: 120px; display: none; border-radius: 50%; object-fit: cover; border: 2px solid #e5e7eb;" />
+            <img
+              id="photoPreview"
+              src=""
+              alt="Preview"
+              style="
+                max-width: 120px;
+                max-height: 120px;
+                display: none;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid #e5e7eb;
+              "
+            />
           </div>
         </div>
       </div>
@@ -381,10 +398,13 @@
       e.preventDefault();
       const name = document.getElementById("appName").value.trim();
       const link = document.getElementById("appLink").value.trim();
-      const description = document.getElementById("appDescription").value.trim();
+      const description = document
+        .getElementById("appDescription")
+        .value.trim();
       const editIndex = document.getElementById("editIndex").value;
       const preview = document.getElementById("photoPreview");
-      let photo = preview.src && preview.style.display !== "none" ? preview.src : "";
+      let photo =
+        preview.src && preview.style.display !== "none" ? preview.src : "";
 
       // Check for duplicate name or link (case-insensitive)
       const duplicate = spreadsheetData.some(
@@ -433,9 +453,8 @@
         .getWebAppsFromSheet();
     }
 
-    loadWebApps(); // Initial load
-    // Call this on page load and after adding/editing/deleting
-    loadWebApps();
+    // Load web apps from spreadsheet
+    loadWebApps(); // Only call this ONCE here!
   });
 
   // Place this outside DOMContentLoaded so it can access commentModal
@@ -509,28 +528,28 @@
   function uploadToImgur(base64Image) {
     return new Promise((resolve, reject) => {
       // Remove the "data:image/jpeg;base64," part
-      const base64Data = base64Image.split(',')[1];
-      
-      fetch('https://api.imgur.com/3/image', {
-        method: 'POST',
+      const base64Data = base64Image.split(",")[1];
+
+      fetch("https://api.imgur.com/3/image", {
+        method: "POST",
         headers: {
-          'Authorization': 'Client-ID YOUR_IMGUR_CLIENT_ID', // Replace with your Client ID
-          'Content-Type': 'application/json'
+          Authorization: "Client-ID YOUR_IMGUR_CLIENT_ID", // Replace with your Client ID
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           image: base64Data,
-          type: 'base64'
+          type: "base64",
+        }),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result.success) {
+            resolve(result.data.link);
+          } else {
+            reject(new Error("Failed to upload image"));
+          }
         })
-      })
-      .then(response => response.json())
-      .then(result => {
-        if (result.success) {
-          resolve(result.data.link);
-        } else {
-          reject(new Error('Failed to upload image'));
-        }
-      })
-      .catch(error => reject(error));
+        .catch((error) => reject(error));
     });
   }
 

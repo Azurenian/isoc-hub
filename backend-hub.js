@@ -1,10 +1,10 @@
 // Add a new web app entry to the sheet
-function addWebAppToSheet(name, link, description) {
+function addWebAppToSheet(name, link, description, photo) {
   var ss = SpreadsheetApp.openById(
     "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
   );
   var sheet = ss.getSheets()[0]; // or use getSheetByName("Sheet1") if needed
-  sheet.appendRow([name, link, description]);
+  sheet.appendRow([name, link, description, photo]);
 }
 
 // Get all web app entries from the sheet
@@ -32,7 +32,7 @@ function deleteWebAppFromSheet(index) {
 }
 
 // Edit a web app entry in the sheet
-function editWebAppInSheet(index, name, link, description) {
+function editWebAppInSheet(index, name, link, description, photo) {
   var ss = SpreadsheetApp.openById(
     "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
   );
@@ -41,6 +41,7 @@ function editWebAppInSheet(index, name, link, description) {
   sheet.getRange(row, 1).setValue(name);
   sheet.getRange(row, 2).setValue(link);
   sheet.getRange(row, 3).setValue(description);
+  sheet.getRange(row, 4).setValue(photo);
 }
 
 // Add a comment to the sheet

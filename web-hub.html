@@ -361,7 +361,7 @@
     // Delete Button
     document
       .querySelector('.btn-danger[title="Delete"]')
-      .addEvenstListener("click", function () {
+      .addEventListener("click", function () {
         const index = window.selectedCardIndex;
         if (index === undefined) {
           showHubNotification("Please select a card to delete.", "#dc3545");
@@ -442,13 +442,16 @@
 
     // Load web apps from spreadsheet
     function loadWebApps() {
-      // Hide cards, show spinner
       document.querySelector(".card-container").style.opacity = 0;
       document.getElementById("loading-spinner").style.display = "flex";
       google.script.run
         .withSuccessHandler(function (data) {
           spreadsheetData = data;
           renderCards(spreadsheetData);
+        })
+        .withFailureHandler(function (err) {
+          showHubNotification("Failed to load data: " + err.message, "#dc3545");
+          document.getElementById("loading-spinner").style.display = "none";
         })
         .getWebAppsFromSheet();
     }

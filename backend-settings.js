@@ -13,7 +13,7 @@ function findRowBySheetName(sheetName) {
     ) {
       return {
         id: data[i][0], // A cell
-        spreadsheetId: data[i][1], // B cell
+        link: data[i][1], // B cell
         description: data[i][2], // C cell
       };
     }
@@ -30,16 +30,17 @@ function findRowBySpreadsheetId(spreadsheetId) {
     // Match either the full link or just the ID
     if (
       String(data[i][1]).trim() === spreadsheetId.trim() ||
-      String(data[i][1]).includes(spreadsheetId.trim())
+      String(data[i][1]).includes(spreadsheetId.trim()) ||
+      spreadsheetId.trim().includes(String(data[i][1]).trim())
     ) {
       return {
         id: data[i][0], // A cell
-        spreadsheetId: data[i][1], // B cell
+        link: data[i][1], // B cell
         description: data[i][2], // C cell
       };
     }
   }
-  throw new Error("Spreadsheet ID not found.");
+  throw new Error("Spreadsheet link or ID not found.");
 }
 
 function saveSpreadsheetId(id) {

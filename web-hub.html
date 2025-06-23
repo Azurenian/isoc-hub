@@ -3,7 +3,7 @@
   Purpose: Hub section container for the ISOC Hub application.
 -->
 
-<div id="hub-section" class="section" style="display: none">
+<div id="hub-section" class="section">
   <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h3 class="fw-bold mb-0 hub-title">
@@ -55,7 +55,7 @@
   <div class="modal-dialog">
     <form id="appForm" class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="appModalLabel">Add Web App</h5>
+        <h5 class="modal-title" id="appModalLabel">Name</h5>
         <button
           type="button"
           class="btn-close"
@@ -66,7 +66,7 @@
       <div class="modal-body">
         <input type="hidden" id="editIndex" />
         <div class="mb-3">
-          <label for="appName" class="form-label">Web App Name</label>
+          <label for="appName" class="form-label">Name</label>
           <input type="text" class="form-control" id="appName" required />
         </div>
         <div class="mb-3">
@@ -93,6 +93,25 @@
   </div>
 </div>
 
+<!-- Add this just before </body> or at the end of your hub section -->
+<div id="loading-overlay" style="
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(30, 41, 59, 0.7); /* dark semi-transparent */
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s;
+">
+  <div style="text-align: center;">
+    <div class="spinner-border text-primary" style="width: 3.5rem; height: 3.5rem;" role="status"></div>
+    <div style="margin-top: 1rem; color: #fff; font-size: 1.25rem; letter-spacing: 1px;">
+      Refreshing...
+    </div>
+  </div>
+</div>
+
 <!-- Bootstrap Icons CDN (add this in your <head> or before the closing </body> tag if not already included) -->
 <link
   rel="stylesheet"
@@ -100,16 +119,16 @@
 />
 
 <script>
-  // Example spreadsheet data (replace with your actual data source)
-  let spreadsheetData = [
+  // Store the initial data
+  const initialData = [
     {
       name: "QTR App",
-      description: "Description for App One.",
+      description: "Link for Spreadsheet.",
       link: "https://example.com/app-one",
     },
     {
       name: "Ticketing System",
-      description: "Description for App Two.",
+      description: "Link for Tickets.",
       link: "https://example.com/app-two",
     },
     {
@@ -119,10 +138,18 @@
     },
   ];
 
+  let spreadsheetData;
+  if (localStorage.getItem("spreadsheetData")) {
+    spreadsheetData = JSON.parse(localStorage.getItem("spreadsheetData"));
+  } else {
+    spreadsheetData = JSON.parse(JSON.stringify(initialData));
+  }
+  renderCards(spreadsheetData);
+
   // Function to render cards
   function renderCards(data) {
     const container = document.getElementById("cards-container");
-    container.innerHTML = "";
+    container.innerHTML = ""; // Clear existing cards
     data.forEach((app) => {
       const card = document.createElement("div");
       card.className = "col-md-4 mb-3";
@@ -142,40 +169,55 @@
   }
 
   // Call the function with your data
+  spreadsheetData = JSON.parse(JSON.stringify(initialData));
   renderCards(spreadsheetData);
 
   // Bootstrap modal instance
   let appModal = null;
   document.addEventListener("DOMContentLoaded", function () {
     appModal = new bootstrap.Modal(document.getElementById("appModal"));
+
+    // Attach the refresh event listener here
+    const refreshBtn = document.querySelector('.btn-info[title="Refresh"]');
+    const loadingOverlay = document.getElementById("loading-overlay");
+    if (refreshBtn) {
+      refreshBtn.addEventListener("click", function () {
+        loadingOverlay.classList.add("active");
+        setTimeout(function () {
+          renderCards(spreadsheetData); // Do NOT reset to initialData
+          loadingOverlay.classList.remove("active");
+        }, 700);
+      });
+    }
+
+    // Open modal in Add mode
+    const addBtn = document.querySelector('.btn-success[title="Add"]');
+    if (addBtn) {
+      addBtn.addEventListener("click", function () {
+        document.getElementById("appModalLabel").textContent = "Add Web App";
+        document.getElementById("appForm").reset();
+        document.getElementById("editIndex").value = "";
+        appModal.show();
+      });
+    }
+
+    // Open modal in Edit mode (first card for demo)
+    const editBtn = document.querySelector('.btn-warning[title="Edit"]');
+    if (editBtn) {
+      editBtn.addEventListener("click", function () {
+        const index = 0;
+        const app = spreadsheetData[index];
+        document.getElementById("appModalLabel").textContent = "Edit Web App";
+        document.getElementById("appName").value = app.name;
+        document.getElementById("appLink").value = app.link;
+        document.getElementById("appDescription").value = app.description;
+        document.getElementById("editIndex").value = index;
+        appModal.show();
+      });
+    }
   });
 
-  // Open modal in Add mode
-  document
-    .querySelector('.btn-success[title="Add"]')
-    .addEventListener("click", function () {
-      document.getElementById("appModalLabel").textContent = "Add Web App";
-      document.getElementById("appForm").reset();
-      document.getElementById("editIndex").value = "";
-      appModal.show();
-    });
-
-  // Open modal in Edit mode (first card for demo)
-  document
-    .querySelector('.btn-warning[title="Edit"]')
-    .addEventListener("click", function () {
-      // For demo: edit the first app (index 0)
-      const index = 0;
-      const app = spreadsheetData[index];
-      document.getElementById("appModalLabel").textContent = "Edit Web App";
-      document.getElementById("appName").value = app.name;
-      document.getElementById("appLink").value = app.link;
-      document.getElementById("appDescription").value = app.description;
-      document.getElementById("editIndex").value = index;
-      appModal.show();
-    });
-
-  // Handle form submit for Add/Edit
+  // Handle form submit for Add/Edit (leave this outside, it's fine)
   document.getElementById("appForm").addEventListener("submit", function (e) {
     e.preventDefault();
     const name = document.getElementById("appName").value;
@@ -190,16 +232,27 @@
       // Edit mode
       spreadsheetData[editIndex] = { name, link, description };
     }
+    // Save to localStorage
+    localStorage.setItem("spreadsheetData", JSON.stringify(spreadsheetData));
     renderCards(spreadsheetData);
     appModal.hide();
   });
-
-  // Make the Refresh button functional
-  document
-    .querySelector('.btn-info[title="Refresh"]')
-    .addEventListener("click", function () {
-      // If you fetch from a backend, call your fetch function here.
-      // For now, just re-render the cards from the current spreadsheetData.
-      renderCards(spreadsheetData);
-    });
 </script>
+
+<style>
+  /* Add to your style-hub.html or inside a <style> tag */
+  #loading-overlay {
+    opacity: 0;
+    pointer-events: none;
+  }
+  #loading-overlay.active {
+    display: flex !important;
+    opacity: 1;
+    pointer-events: all;
+    animation: fadeIn 0.3s;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+</style>

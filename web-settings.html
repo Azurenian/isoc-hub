@@ -74,6 +74,7 @@
   </div>
 
   <script>
+<<<<<<< HEAD
 function showNotification(message, color = "#28a745") {
   const bar = document.getElementById("notification-bar");
   bar.textContent = message;
@@ -87,6 +88,17 @@ function showNotification(message, color = "#28a745") {
     }, 400);
   }, 3000);
 }
+=======
+    function showNotification(message, color = "#28a745") {
+      const bar = document.getElementById("notification-bar");
+      bar.textContent = message;
+      bar.style.background = color;
+      bar.style.display = "block";
+      setTimeout(() => {
+        bar.style.display = "none";
+      }, 3000);
+    }
+>>>>>>> b5955e0340085a734808bb8e1a69df9acaf91811
 
 function renderSingleRow(data) {
   const container = document.getElementById("sheet-data-container");
@@ -146,7 +158,69 @@ function fetchByName() {
     .findRowBySheetName(name); // This must match the Apps Script function name
 }
 
+<<<<<<< HEAD
 document.getElementById("search-by-id-btn").onclick = fetchById;
 document.getElementById("search-by-name-btn").onclick = fetchByName;
+=======
+      // Regex to extract ID from Google Sheets URL
+      const match = id.match(/\/d\/([a-zA-Z0-9-_]+)/);
+      if (match) id = match[1];
+
+      if (!/^[a-zA-Z0-9-_]{30,}$/.test(id)) {
+        showNotification(
+          "Please enter a valid Google Sheets link or ID.",
+          "#dc3545"
+        );
+        return;
+      }
+      if (!name) {
+        showNotification("Please enter a Sheet Name.", "#dc3545");
+        return;
+      }
+      // Show notification immediately
+      showNotification("Saving Spreadsheet ID...");
+      google.script.run
+        .withSuccessHandler(function () {
+          showNotification("Spreadsheet ID saved!");
+          input.value = ""; // Clear the input box
+        })
+        .withFailureHandler(function (err) {
+          showNotification("Error: " + err.message, "#dc3545");
+        })
+        .saveSheetInfo(name, id); // Call new backend function
+    }
+
+    document.getElementById("save-sheet-info-btn").onclick = saveSheetInfo;
+
+    // Optional: allow Enter key to trigger save if both fields filled
+    document
+      .getElementById("sheet-name-input")
+      .addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          saveSpreadsheetId();
+        }
+      });
+
+    document.getElementById("save-sheet-name-btn").onclick = function () {
+      const input = document.getElementById("sheet-name-input");
+      const name = input.value.trim();
+      if (!name) {
+        document.getElementById("sheet-name-status").textContent =
+          "Please enter a Sheet Name.";
+        return;
+      }
+      google.script.run
+        .withSuccessHandler(function () {
+          document.getElementById("sheet-name-status").textContent =
+            "Sheet Name saved!";
+          input.value = ""; // Clear the input box
+        })
+        .withFailureHandler(function (err) {
+          document.getElementById("sheet-name-status").textContent =
+            "Error: " + err.message;
+        })
+        .saveSheetName(name);
+    };
+>>>>>>> b5955e0340085a734808bb8e1a69df9acaf91811
   </script>
 </div>

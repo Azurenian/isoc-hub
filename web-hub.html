@@ -236,7 +236,7 @@
         // Add mode: send data to spreadsheet
         google.script.run
           .withSuccessHandler(function() {
-            showHubNotification("Web App saved successfully!");
+            showHubNotification("Added successfully!");
             loadWebApps();
           })
           .addWebAppToSheet(name, link, description);
@@ -244,7 +244,7 @@
         // Edit mode: update spreadsheet
         google.script.run
           .withSuccessHandler(function() {
-            showHubNotification("Web App updated successfully!");
+            showHubNotification("Updated successfully!");
             loadWebApps();
             window.selectedCardIndex = undefined;
           })

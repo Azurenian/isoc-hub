@@ -77,33 +77,4 @@
       }
     };
   })();
-
-  document.addEventListener('DOMContentLoaded', function() {
-    // Get the toggle element
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    
-    // Check for saved theme preference or use preferred color scheme
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    // Set initial state based on saved preference or system preference
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      document.body.classList.add('dark-mode');
-      darkModeToggle.checked = true;
-    } else {
-      document.body.classList.remove('dark-mode');
-      darkModeToggle.checked = false;
-    }
-    
-    // Toggle dark mode on change
-    darkModeToggle.addEventListener('change', function() {
-      if (this.checked) {
-        document.body.classList.add('dark-mode');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.body.classList.remove('dark-mode');
-        localStorage.setItem('theme', 'light');
-      }
-    });
-  });
 </script>

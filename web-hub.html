@@ -18,17 +18,21 @@
       <!-- Controls Row: Search Bar (left), Buttons (right) -->
       <div class="row mb-4">
         <div class="col-md-6 col-12 mb-2 mb-md-0">
-          <div class="input-group" style="max-width: 260px;">
+          <div class="input-group shadow-sm" style="max-width: 320px;">
+            <span
+              class="input-group-text bg-white border-end-0"
+              style="border-radius: 8px 0 0 8px;"
+            >
+              <i class="bi bi-search text-secondary"></i>
+            </span>
             <input
               type="text"
               id="hubSearchInput"
-              class="form-control"
-              placeholder="Search..."
+              class="form-control border-start-0"
+              placeholder="Search web apps..."
               aria-label="Search"
+              style="border-radius: 0 8px 8px 0; background: #f8f9fa;"
             />
-            <span class="input-group-text bg-white">
-              <i class="bi bi-search"></i>
-            </span>
           </div>
         </div>
         <div class="col-md-6 col-12 d-flex justify-content-md-end justify-content-start gap-2">

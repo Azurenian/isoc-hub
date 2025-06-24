@@ -7,19 +7,15 @@
   <div class="container-fluid py-4">
     <!-- Hub Header -->
     <div class="container py-3">
-      <div class="row align-items-center mb-4">
-        <div class="col-md-8 col-12 mb-2 mb-md-0">
-          <h3 class="fw-bold hub-title m-0">
-            International Service Operations Center Hub
-          </h3>
-        </div>
-        <div class="col-md-4 col-12 text-md-end">
-          <div class="input-group" style="max-width: 300px; margin-left: auto;">
+      <!-- Search Bar Row (top, left-aligned) -->
+      <div class="row mb-2">
+        <div class="col-md-4 col-12">
+          <div class="input-group" style="max-width: 260px;">
             <input
               type="text"
               id="hubSearchInput"
               class="form-control"
-              placeholder="Search web apps..."
+              placeholder="Search..."
               aria-label="Search"
             />
             <span class="input-group-text bg-white">
@@ -28,40 +24,33 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div class="btn-group" role="group" aria-label="Hub Controls">
-        <button
-          class="btn btn-success d-flex align-items-center me-2 shadow-sm"
-          title="Add"
-        >
-          <span class="me-1 fs-5"><i class="bi bi-plus-circle"></i></span>
-          <span>Add</span>
-        </button>
-        <button
-          class="btn btn-warning d-flex align-items-center me-2 shadow-sm text-dark"
-          title="Edit"
-        >
-          <span class="me-1 fs-5"><i class="bi bi-pencil-square"></i></span>
-          <span>Edit</span>
-        </button>
-        <button
-          class="btn btn-danger d-flex align-items-center me-2 shadow-sm"
-          title="Delete"
-        >
-          <span class="me-1 fs-5"><i class="bi bi-trash"></i></span>
-          <span>Delete</span>
-        </button>
-        <button
-          class="btn btn-info d-flex align-items-center shadow-sm text-white"
-          title="Refresh"
-        >
-          <span class="me-1 fs-5"><i class="bi bi-arrow-clockwise"></i></span>
-          <span>Refresh</span>
-        </button>
+      <!-- Title Row (below search bar) -->
+      <div class="row mb-2">
+        <div class="col-12">
+          <h3 class="fw-bold hub-title m-0">
+            International Service Operations Center Hub
+          </h3>
+        </div>
+      </div>
+      <!-- Buttons Row (right-aligned, below title) -->
+      <div class="row mb-3">
+        <div class="col-12 d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-success" title="Add">
+            <i class="bi bi-plus-circle"></i> Add
+          </button>
+          <button type="button" class="btn btn-warning" title="Edit">
+            <i class="bi bi-pencil-square"></i> Edit
+          </button>
+          <button type="button" class="btn btn-danger" title="Delete">
+            <i class="bi bi-trash"></i> Delete
+          </button>
+          <button type="button" class="btn btn-info" title="Refresh">
+            <i class="bi bi-arrow-clockwise"></i> Refresh
+          </button>
+        </div>
       </div>
     </div>
+
     <!-- Loading Spinner -->
     <div
       id="loading-spinner"

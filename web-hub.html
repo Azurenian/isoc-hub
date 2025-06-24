@@ -40,6 +40,20 @@
         </button>
       </div>
     </div>
+    <!-- Add this before the .btn-group in your hub header -->
+    <div class="input-group me-3" style="max-width: 260px;">
+      <input
+        type="text"
+        id="hubSearchInput"
+        class="form-control"
+        placeholder="Search..."
+        aria-label="Search"
+        style="border-radius: 8px;"
+      />
+      <span class="input-group-text bg-white" style="border-radius: 8px;">
+        <i class="bi bi-search"></i>
+      </span>
+    </div>
     <!-- Loading Spinner -->
     <div
       id="loading-spinner"
@@ -918,4 +932,18 @@
       })
       .getCommentsForCard(cardId);
   };
+
+  // Filter and render cards based on search input
+  document.getElementById("hubSearchInput").addEventListener("input", function () {
+    const query = this.value.trim().toLowerCase();
+    if (!query) {
+      renderCards(spreadsheetData);
+      return;
+    }
+    const filtered = spreadsheetData.filter(app =>
+      (app.name && app.name.toLowerCase().includes(query)) ||
+      (app.description && app.description.toLowerCase().includes(query))
+    );
+    renderCards(filtered);
+  });
 </script>

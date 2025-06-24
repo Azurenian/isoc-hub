@@ -634,34 +634,11 @@
         google.script.run
           .withSuccessHandler(function () {
             showHubNotification("Web App deleted successfully!");
-            // Remove from spreadsheetData
-            spreadsheetData.splice(pendingDeleteIndex, 1);
-            // Remove the card DOM element directly
-            const colDiv = document.querySelector(
-              `.card-container > .col-md-4.mb-3[data-index="${pendingDeleteIndex}"]`
-            );
-            if (colDiv) {
-              colDiv.style.transition = "opacity 0.4s";
-              colDiv.style.opacity = 0;
-              setTimeout(() => {
-                colDiv.remove();
-                // Re-index remaining cards for correct selection/editing
-                document
-                  .querySelectorAll(".card-container > .col-md-4.mb-3")
-                  .forEach((el, idx) => {
-                    el.setAttribute("data-index", idx);
-                    el.querySelector(".select-card-checkbox").setAttribute(
-                      "data-index",
-                      idx
-                    );
-                    el.querySelector(".hub-btn-comment").setAttribute(
-                      "data-index",
-                      idx
-                    );
-                  });
-              }, 400);
-            }
             window.selectedCardIndex = undefined;
+            loadWebApps(); // <-- This reloads and re-renders the cards, removing the deleted one
+          })
+          .withFailureHandler(function (err) {
+            showHubNotification("Failed to delete: " + err.message, "#dc3545");
           })
           .deleteWebAppFromSheet(pendingDeleteIndex);
         pendingDeleteIndex = null;

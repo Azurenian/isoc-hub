@@ -5,10 +5,32 @@
 
 <div id="hub-section" class="section active">
   <div class="container-fluid py-4">
+    <!-- Hub Header -->
+    <div class="container py-3">
+      <div class="row align-items-center mb-4">
+        <div class="col-md-8 col-12 mb-2 mb-md-0">
+          <h3 class="fw-bold hub-title m-0">
+            International Service Operations Center Hub
+          </h3>
+        </div>
+        <div class="col-md-4 col-12 text-md-end">
+          <div class="input-group" style="max-width: 300px; margin-left: auto;">
+            <input
+              type="text"
+              id="hubSearchInput"
+              class="form-control"
+              placeholder="Search web apps..."
+              aria-label="Search"
+            />
+            <span class="input-group-text bg-white">
+              <i class="bi bi-search"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3 class="fw-bold mb-0 hub-title">
-        International Service Operations Center Hub
-      </h3>
       <div class="btn-group" role="group" aria-label="Hub Controls">
         <button
           class="btn btn-success d-flex align-items-center me-2 shadow-sm"
@@ -40,20 +62,6 @@
         </button>
       </div>
     </div>
-    <!-- Add this before the .btn-group in your hub header -->
-    <div class="input-group me-3" style="max-width: 260px;">
-      <input
-        type="text"
-        id="hubSearchInput"
-        class="form-control"
-        placeholder="Search..."
-        aria-label="Search"
-        style="border-radius: 8px;"
-      />
-      <span class="input-group-text bg-white" style="border-radius: 8px;">
-        <i class="bi bi-search"></i>
-      </span>
-    </div>
     <!-- Loading Spinner -->
     <div
       id="loading-spinner"
@@ -71,10 +79,9 @@
 
     <!-- Cards Container -->
     <div class="container">
-      <div
-        class="row card-container"
-        style="opacity: 0; transition: opacity 0.5s"
-      ></div>
+      <div class="row card-container g-4" style="opacity: 0; transition: opacity 0.5s">
+        <!-- Cards will be rendered here by JS -->
+      </div>
     </div>
   </div>
 </div>

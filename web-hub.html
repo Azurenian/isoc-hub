@@ -8,16 +8,16 @@
     <!-- Hub Header -->
     <div class="container py-3">
       <!-- Title Row -->
-      <div class="row mb-2">
+      <div class="row mb-3">
         <div class="col-12">
           <h3 class="fw-bold hub-title m-0">
             International Service Operations Center Hub
           </h3>
         </div>
       </div>
-      <!-- Search Bar Row (left-aligned, below title) -->
-      <div class="row mb-2">
-        <div class="col-md-4 col-12">
+      <!-- Controls Row: Search Bar (left), Buttons (right) -->
+      <div class="row mb-4">
+        <div class="col-md-6 col-12 mb-2 mb-md-0">
           <div class="input-group" style="max-width: 260px;">
             <input
               type="text"
@@ -31,10 +31,7 @@
             </span>
           </div>
         </div>
-      </div>
-      <!-- Buttons Row (right-aligned, below search bar) -->
-      <div class="row mb-3">
-        <div class="col-12 d-flex justify-content-end gap-2">
+        <div class="col-md-6 col-12 d-flex justify-content-md-end justify-content-start gap-2">
           <button type="button" class="btn btn-success" title="Add">
             <i class="bi bi-plus-circle"></i> Add
           </button>
@@ -49,27 +46,24 @@
           </button>
         </div>
       </div>
-    </div>
-
-    <!-- Loading Spinner -->
-    <div
-      id="loading-spinner"
-      style="
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100px;
-      "
-    >
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+      <!-- Loading Spinner -->
+      <div
+        id="loading-spinner"
+        style="
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100px;
+        "
+      >
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Cards Container -->
-    <div class="container">
-      <div class="row card-container g-4" style="opacity: 0; transition: opacity 0.5s">
-        <!-- Cards will be rendered here by JS -->
+      <!-- Card Body -->
+      <div class="row card-container g-4">
+        <!-- Cards will be rendered here -->
       </div>
     </div>
   </div>

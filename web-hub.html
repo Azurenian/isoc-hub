@@ -4,7 +4,65 @@
 -->
 
 <div id="hub-section" class="section active">
-  <div class="card-container"></div>
+  <div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="fw-bold mb-0 hub-title">
+        International Service Operations Center Hub
+      </h3>
+      <div class="btn-group" role="group" aria-label="Hub Controls">
+        <button
+          class="btn btn-success d-flex align-items-center me-2 shadow-sm"
+          title="Add"
+        >
+          <span class="me-1 fs-5"><i class="bi bi-plus-circle"></i></span>
+          <span>Add</span>
+        </button>
+        <button
+          class="btn btn-warning d-flex align-items-center me-2 shadow-sm text-dark"
+          title="Edit"
+        >
+          <span class="me-1 fs-5"><i class="bi bi-pencil-square"></i></span>
+          <span>Edit</span>
+        </button>
+        <button
+          class="btn btn-danger d-flex align-items-center me-2 shadow-sm"
+          title="Delete"
+        >
+          <span class="me-1 fs-5"><i class="bi bi-trash"></i></span>
+          <span>Delete</span>
+        </button>
+        <button
+          class="btn btn-info d-flex align-items-center shadow-sm text-white"
+          title="Refresh"
+        >
+          <span class="me-1 fs-5"><i class="bi bi-arrow-clockwise"></i></span>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </div>
+    <!-- Loading Spinner -->
+    <div
+      id="loading-spinner"
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100px;
+      "
+    >
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Cards Container -->
+    <div class="container">
+      <div
+        class="row card-container"
+        style="opacity: 0; transition: opacity 0.5s"
+      ></div>
+    </div>
+  </div>
 </div>
 
 <!-- Modal for Add/Edit -->
@@ -44,31 +102,6 @@
             rows="3"
             required
           ></textarea>
-        </div>
-        <!-- Upload Photo Field -->
-        <div class="mb-3">
-          <label for="appPhoto" class="form-label">Upload Photo</label>
-          <input
-            type="file"
-            class="form-control"
-            id="appPhoto"
-            accept="image/*"
-          />
-          <div class="mt-2 text-center">
-            <img
-              id="photoPreview"
-              src=""
-              alt="Preview"
-              style="
-                max-width: 120px;
-                max-height: 120px;
-                display: none;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 2px solid #e5e7eb;
-              "
-            />
-          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -206,26 +239,48 @@
     }
   }
 
-  #commentList {
-    transition: background 0.3s, color 0.3s;
+  /* Smooth fade-in for comments modal body */
+  #viewCommentsBody {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  #commentList .comment-item {
-    margin-bottom: 0.75rem;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--bs-border-color, #e5e7eb);
-    background: var(--bs-light, #f8f9fa);
-    color: var(--bs-body-color, #212529);
-  }
-  body.dark-mode #commentList .comment-item,
-  [data-bs-theme="dark"] #commentList .comment-item {
-    background: #23272f;
-    color: #f3f4f6;
-    border-color: #343a40;
+  #viewCommentsModal.show #viewCommentsBody {
+    opacity: 1;
+    transform: translateY(0);
   }
 
-  .section { display: none; }
-.section.active { display: block; }
+  /* Comments modal dark/light blending */
+  .comments-modal-content {
+    background: var(--comments-bg, #fff);
+    color: var(--comments-fg, #222);
+    transition: background 0.3s, color 0.3s;
+  }
+  body.dark-mode .comments-modal-content {
+    --comments-bg: #181a20;
+    --comments-fg: #e5e7eb;
+    background: var(--comments-bg);
+    color: var(--comments-fg);
+  }
+  body:not(.dark-mode) .comments-modal-content {
+    --comments-bg: #fff;
+    --comments-fg: #222;
+    background: var(--comments-bg);
+    color: var(--comments-fg);
+  }
+  /* Comment card style for both modes */
+  .comments-modal-content .bg-light {
+    background: rgba(120, 130, 150, 0.08) !important;
+    border: 1px solid rgba(120, 130, 150, 0.13) !important;
+    color: inherit;
+    transition: background 0.3s;
+  }
+  body.dark-mode .comments-modal-content .bg-light {
+    background: rgba(60, 70, 90, 0.35) !important;
+    border: 1px solid rgba(120, 130, 150, 0.13) !important;
+    color: #e5e7eb;
+  }
 </style>
 
 <!-- Delete Confirmation Modal -->
@@ -283,14 +338,6 @@
       </div>
       <div class="modal-body">
         <input type="hidden" id="commentCardId" />
-        <button
-          type="button"
-          id="toggleCommentsBtn"
-          class="btn btn-outline-secondary mb-3 w-100"
-        >
-          <i class="bi bi-chat-dots"></i> View Comments
-        </button>
-        <div id="commentList" class="mb-3" style="display: none"></div>
         <div class="mb-3">
           <label for="commentName" class="form-label">Your Name</label>
           <input type="text" class="form-control" id="commentName" required />
@@ -304,6 +351,19 @@
             required
           ></textarea>
         </div>
+        <!-- Add this inside your comment modal, after the comment textarea -->
+        <div class="d-grid mt-2">
+          <button
+            type="button"
+            id="seeRecentCommentBtn"
+            class="btn btn-primary fw-bold"
+            style="font-size: 1.08rem"
+          >
+            <i class="bi bi-chat-dots"></i>
+            <span style="margin-left: 0.4em">View Comments</span>
+          </button>
+        </div>
+        <div id="recentCommentResult" class="mt-2"></div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -312,6 +372,37 @@
         <button type="submit" class="btn btn-primary">Submit Comment</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Comments Modal (already present, just update styles below) -->
+<div
+  class="modal fade"
+  id="viewCommentsModal"
+  tabindex="-1"
+  aria-labelledby="viewCommentsModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content comments-modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewCommentsModalLabel">Comments</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body" id="viewCommentsBody">
+        <!-- Comments will be loaded here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -354,6 +445,7 @@
     data.forEach((app, index) => {
       const card = document.createElement("div");
       card.className = "col-md-4 mb-3";
+      card.setAttribute("data-index", index); // <-- add this line
       card.innerHTML = `
         <div class="card h-100 shadow-sm border-0" data-index="${index}">
           <div class="card-body d-flex flex-column position-relative">
@@ -427,66 +519,16 @@
     document.getElementById("loading-spinner").style.display = "none";
   }
 
-  // Toggle comments visibility and fetch if needed
-  function setupToggleComments() {
-    const btn = document.getElementById("toggleCommentsBtn");
-    const listDiv = document.getElementById("commentList");
-    let loadedCardId = null;
-
-    btn.onclick = function () {
-      const cardId = document.getElementById("commentCardId").value;
-      if (listDiv.style.display === "none") {
-        btn.innerHTML = '<i class="bi bi-chat-dots"></i> Hide Comments';
-        listDiv.innerHTML = '<div class="text-muted">Loading comments...</div>';
-        listDiv.style.display = "block";
-        // Only fetch if not already loaded for this card
-        if (loadedCardId !== cardId) {
-          google.script.run
-            .withSuccessHandler(function (comments) {
-              renderCommentList(comments);
-              loadedCardId = cardId;
-            })
-            .getCommentsForCard(cardId);
-        }
-      } else {
-        btn.innerHTML = '<i class="bi bi-chat-dots"></i> View Comments';
-        listDiv.style.display = "none";
-      }
-    };
-  }
-
-  // Update addCommentButtonListeners to reset toggle state
   function addCommentButtonListeners() {
     document.querySelectorAll(".comment-card-btn").forEach((btn) => {
       btn.onclick = function () {
         const cardId = btn.getAttribute("data-card-id");
         document.getElementById("commentCardId").value = cardId;
         document.getElementById("commentForm").reset();
-        // Reset comments view
-        document.getElementById("commentList").style.display = "none";
-        document.getElementById("toggleCommentsBtn").innerHTML =
-          '<i class="bi bi-chat-dots"></i> View Comments';
+        document.getElementById("recentCommentResult").innerHTML = ""; // Clear previous comments
         commentModal.show();
       };
     });
-  }
-
-  // Helper to render comments
-  function renderCommentList(comments) {
-    const listDiv = document.getElementById("commentList");
-    if (!comments || comments.length === 0) {
-      listDiv.innerHTML = '<div class="text-muted">No comments yet.</div>';
-      return;
-    }
-    listDiv.innerHTML = comments
-      .map(
-        (c) =>
-          `<div class="comment-item">
-          <div class="fw-semibold" style="font-size:0.97em;">${c.name}</div>
-          <div style="font-size:0.98em;">${c.comment}</div>
-        </div>`
-      )
-      .join("");
   }
 
   // Add this helper function
@@ -519,21 +561,42 @@
       </div>
     `;
     if (colDiv) {
-      // Update existing card
-      colDiv.outerHTML = cardHTML;
-    } else {
-      // Add new card
-      const newColDiv = document.createElement("div");
-      newColDiv.className = "col-md-4 mb-3";
-      newColDiv.innerHTML = cardHTML;
-      container.appendChild(newColDiv);
+      colDiv.innerHTML = cardHTML; // Only update, do not add new for edit
+    } else if (index === spreadsheetData.length - 1) {
+      // Only add new card if it's a new entry (add mode)
+      colDiv = document.createElement("div");
+      colDiv.className = "col-md-4 mb-3";
+      colDiv.setAttribute("data-index", index);
+      colDiv.innerHTML = cardHTML;
+      container.appendChild(colDiv);
     }
   }
 
   // Bootstrap modal instance
   let appModal = null;
   let deleteConfirmModal = null;
-  let commentModal
+  let commentModal = null;
+  let viewCommentsModal = null;
+
+  document.addEventListener("DOMContentLoaded", function () {
+    appModal = new bootstrap.Modal(document.getElementById("appModal"));
+    deleteConfirmModal = new bootstrap.Modal(
+      document.getElementById("deleteConfirmModal")
+    );
+    commentModal = new bootstrap.Modal(document.getElementById("commentModal"));
+    viewCommentsModal = new bootstrap.Modal(
+      document.getElementById("viewCommentsModal")
+    );
+
+    // Add Button
+    document
+      .querySelector('.btn-success[title="Add"]')
+      .addEventListener("click", function () {
+        document.getElementById("appModalLabel").textContent = "Add Web App";
+        document.getElementById("appForm").reset();
+        document.getElementById("editIndex").value = "";
+        appModal.show();
+      });
 
     // Edit Button
     document
@@ -545,7 +608,6 @@
           return;
         }
         const app = spreadsheetData[index];
-        document.getElementById("appModalLabel").textContent = "Edit Web App";
         document.getElementById("appName").value = app.name;
         document.getElementById("appLink").value = app.link;
         document.getElementById("appDescription").value = app.description;
@@ -574,8 +636,31 @@
             showHubNotification("Web App deleted successfully!");
             // Remove from spreadsheetData
             spreadsheetData.splice(pendingDeleteIndex, 1);
-            // Re-render all cards to update DOM and event listeners
-            renderCards(spreadsheetData);
+            // Remove the card DOM element directly
+            const colDiv = document.querySelector(
+              `.card-container > .col-md-4.mb-3[data-index="${pendingDeleteIndex}"]`
+            );
+            if (colDiv) {
+              colDiv.style.transition = "opacity 0.4s";
+              colDiv.style.opacity = 0;
+              setTimeout(() => {
+                colDiv.remove();
+                // Re-index remaining cards for correct selection/editing
+                document
+                  .querySelectorAll(".card-container > .col-md-4.mb-3")
+                  .forEach((el, idx) => {
+                    el.setAttribute("data-index", idx);
+                    el.querySelector(".select-card-checkbox").setAttribute(
+                      "data-index",
+                      idx
+                    );
+                    el.querySelector(".hub-btn-comment").setAttribute(
+                      "data-index",
+                      idx
+                    );
+                  });
+              }, 400);
+            }
             window.selectedCardIndex = undefined;
           })
           .deleteWebAppFromSheet(pendingDeleteIndex);
@@ -588,6 +673,7 @@
     document
       .querySelector('.btn-info[title="Refresh"]')
       .addEventListener("click", function () {
+        window.selectedCardIndex = undefined;
         loadWebApps();
       });
 
@@ -600,53 +686,53 @@
         .getElementById("appDescription")
         .value.trim();
       const editIndex = document.getElementById("editIndex").value;
-      const preview = document.getElementById("photoPreview");
-      let photo =
-        preview.src && preview.style.display !== "none" ? preview.src : "";
-
-      // Fix: Proper duplicate check
-      const duplicate = spreadsheetData.some(
-        (app, idx) =>
-          (editIndex === "" || idx != Number(editIndex)) &&
-          (app.name.trim().toLowerCase() === name.toLowerCase() ||
-            app.link.trim() === link)
-      );
-
-      if (duplicate) {
-        showHubNotification("Name or Link is already registered!", "#dc3545");
-        return;
-      }
 
       if (editIndex === "") {
-        // Add mode
         google.script.run
-          .withSuccessHandler(function (data) {
+          .withSuccessHandler(function () {
             showHubNotification("Added successfully!");
-            spreadsheetData.push(data);
-            renderCards(spreadsheetData); // Re-render all cards and re-attach listeners
+            // Add new card to local data and render only the new card
+            const newApp = { name, link, description };
+            spreadsheetData.push(newApp);
+            addOrUpdateCard(newApp, spreadsheetData.length - 1);
+            // Fade in the container if needed
+            document.querySelector(".card-container").style.opacity = 1;
+            // After successful add
+            window.selectedCardIndex = undefined;
+            renderCards(spreadsheetData);
           })
-          .addWebAppToSheet(name, link, description, photo);
+          .withFailureHandler(function (err) {
+            showHubNotification("Failed to add: " + err.message, "#dc3545");
+          })
+          .addWebAppToSheet(name, link, description);
       } else {
         // Edit mode
         google.script.run
           .withSuccessHandler(function () {
-            // Update local data
-            spreadsheetData[editIndex] = { name, link, description, photo };
-            renderCards(spreadsheetData); // Re-render all cards and update event listeners
+            spreadsheetData[editIndex] = { name, link, description };
+            renderCards(spreadsheetData);
+            // After successful edit
             window.selectedCardIndex = undefined;
+            renderCards(spreadsheetData);
             showHubNotification("Updated successfully!");
           })
-          .editWebAppInSheet(editIndex, name, link, description, photo);
+          .editWebAppInSheet(editIndex, name, link, description);
       }
       appModal.hide();
     });
 
     // Load web apps from spreadsheet
     function loadWebApps() {
+      document.querySelector(".card-container").style.opacity = 0;
+      document.getElementById("loading-spinner").style.display = "flex";
       google.script.run
-        .withSuccessHandler(function(data) {
-          spreadsheetData = data || [];
+        .withSuccessHandler(function (data) {
+          spreadsheetData = data;
           renderCards(spreadsheetData);
+        })
+        .withFailureHandler(function (err) {
+          showHubNotification("Failed to load data: " + err.message, "#dc3545");
+          document.getElementById("loading-spinner").style.display = "none";
         })
         .getWebAppsFromSheet();
     }
@@ -747,7 +833,112 @@
             reject(new Error("Imgur upload failed: " + result.message));
           }
         })
-        .catch((err) => reject(new Error("Imgur upload error: " + err.message)));
+        .catch((error) =>
+          reject(new Error("Imgur upload error: " + error.message))
+        );
     });
   }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Apply futuristic styling to buttons
+    const openLinkBtns = document.querySelectorAll(".btn-outline-primary");
+    const selectBtns = document.querySelectorAll(".btn-outline-secondary");
+    const commentBtns = document.querySelectorAll(".btn-outline-info");
+
+    openLinkBtns.forEach((btn) => {
+      btn.classList.add("btn-futuristic", "btn-link-futuristic");
+      btn.innerHTML = `<i class="bi bi-box-arrow-up-right"></i> Open Link`;
+    });
+
+    selectBtns.forEach((btn) => {
+      btn.classList.add("btn-futuristic", "btn-select-futuristic");
+      btn.innerHTML = `<i class="bi bi-check-circle"></i> Select`;
+
+      // Handle selection visual feedback
+      btn.addEventListener("click", function () {
+        const wasSelected = this.classList.contains("selected");
+        document.querySelectorAll(".select-card-btn").forEach((b) => {
+          b.classList.remove("selected");
+        });
+        if (!wasSelected) {
+          this.classList.add("selected");
+        }
+      });
+    });
+
+    commentBtns.forEach((btn) => {
+      btn.classList.add("btn-futuristic", "btn-comment-futuristic");
+      btn.innerHTML = `<i class="bi bi-chat-dots"></i> Comment`;
+    });
+  });
+
+  // New function to fetch and display comments for a specific card
+  function viewComments(cardId) {
+    const container = document.getElementById("viewCommentsBody");
+    container.innerHTML = ""; // Clear existing content
+
+    // Fetch comments from the server
+    google.script.run
+      .withSuccessHandler(function (comments) {
+        if (comments.length > 0) {
+          container.innerHTML = comments
+            .map(
+              (comment) => `
+              <div class="bg-light p-3 rounded mb-2">
+                <div class="fw-semibold">${comment.name}</div>
+                <div style="font-size:0.98em;">${comment.comment}</div>
+                <div class="text-muted" style="font-size:0.85em;">${
+                  comment.date || ""
+                }</div>
+              </div>
+            `
+            )
+            .join("");
+        } else {
+          container.innerHTML = `<div class="text-muted">No comments yet.</div>`;
+        }
+        viewCommentsModal.show();
+      })
+      .getCommentsForCard(cardId);
+  }
+
+  document.getElementById("seeRecentCommentBtn").onclick = function () {
+    const cardId = document.getElementById("commentCardId").value;
+    // Show modal immediately for no delay UX
+    viewCommentsModal.show();
+    // Clear and fade out body before loading
+    const container = document.getElementById("viewCommentsBody");
+    container.style.opacity = 0;
+    container.style.transform = "translateY(16px)";
+    container.innerHTML = `<div class="text-muted">Loading comments...</div>`;
+    // Fetch comments
+    google.script.run
+      .withSuccessHandler(function (comments) {
+        if (comments && comments.length > 0) {
+          container.innerHTML = comments
+            .map(
+              (comment) => `
+          <div class="border rounded p-2 bg-light mb-2">
+            <div class="fw-semibold" style="font-size:0.97em;">${
+              comment.name
+            }</div>
+            <div style="font-size:0.98em;">${comment.comment}</div>
+            <div class="text-muted" style="font-size:0.85em;">${
+              comment.date || ""
+            }</div>
+          </div>
+        `
+            )
+            .join("");
+        } else {
+          container.innerHTML = `<div class="text-muted">No comments yet.</div>`;
+        }
+        // Smooth fade-in after content is set
+        setTimeout(() => {
+          container.style.opacity = 1;
+          container.style.transform = "translateY(0)";
+        }, 10);
+      })
+      .getCommentsForCard(cardId);
+  };
 </script>

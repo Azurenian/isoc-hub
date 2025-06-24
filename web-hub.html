@@ -4,65 +4,7 @@
 -->
 
 <div id="hub-section" class="section active">
-  <div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3 class="fw-bold mb-0 hub-title">
-        International Service Operations Center Hubs
-      </h3>
-      <div class="btn-group" role="group" aria-label="Hub Controls">
-        <button
-          class="btn btn-success d-flex align-items-center me-2 shadow-sm"
-          title="Add"
-        >
-          <span class="me-1 fs-5"><i class="bi bi-plus-circle"></i></span>
-          <span>Add</span>
-        </button>
-        <button
-          class="btn btn-warning d-flex align-items-center me-2 shadow-sm text-dark"
-          title="Edit"
-        >
-          <span class="me-1 fs-5"><i class="bi bi-pencil-square"></i></span>
-          <span>Edit</span>
-        </button>
-        <button
-          class="btn btn-danger d-flex align-items-center me-2 shadow-sm"
-          title="Delete"
-        >
-          <span class="me-1 fs-5"><i class="bi bi-trash"></i></span>
-          <span>Delete</span>
-        </button>
-        <button
-          class="btn btn-info d-flex align-items-center shadow-sm text-white"
-          title="Refresh"
-        >
-          <span class="me-1 fs-5"><i class="bi bi-arrow-clockwise"></i></span>
-          <span>Refresh</span>
-        </button>
-      </div>
-    </div>
-    <!-- Loading Spinner -->
-    <div
-      id="loading-spinner"
-      style="
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100px;
-      "
-    >
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-    </div>
-
-    <!-- Cards Container -->
-    <div class="container">
-      <div
-        class="row card-container"
-        style="opacity: 0; transition: opacity 0.5s"
-      ></div>
-    </div>
-  </div>
+  <div class="card-container"></div>
 </div>
 
 <!-- Modal for Add/Edit -->
@@ -281,6 +223,9 @@
     color: #f3f4f6;
     border-color: #343a40;
   }
+
+  .section { display: none; }
+.section.active { display: block; }
 </style>
 
 <!-- Delete Confirmation Modal -->
@@ -698,16 +643,10 @@
 
     // Load web apps from spreadsheet
     function loadWebApps() {
-      document.querySelector(".card-container").style.opacity = 0;
-      document.getElementById("loading-spinner").style.display = "flex";
       google.script.run
-        .withSuccessHandler(function (data) {
-          spreadsheetData = data;
+        .withSuccessHandler(function(data) {
+          spreadsheetData = data || [];
           renderCards(spreadsheetData);
-        })
-        .withFailureHandler(function (err) {
-          showHubNotification("Failed to load data: " + err.message, "#dc3545");
-          document.getElementById("loading-spinner").style.display = "none";
         })
         .getWebAppsFromSheet();
     }

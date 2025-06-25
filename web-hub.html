@@ -904,23 +904,12 @@
       const listItem = e.target.closest("li.list-group-item-action");
       if (listItem) {
         const name = listItem.getAttribute("data-name");
-        
-        console.log("Suggestion clicked:", {name});
-        
-        // Update search input
-        if (type === 'id') {
-          cleanSearchInput.value = id;
-        } else if (type === 'link') {
-          cleanSearchInput.value = link;
-        } else {
-          cleanSearchInput.value = name;
-        }
-        
-        // Filter data
+        cleanSearchInput.value = name; // Always set the search bar to the clicked name
+
+        // Filter data using the selected name
         google.script.run
           .withSuccessHandler(function(filteredData) {
             if (filteredData && filteredData.length > 0) {
-              console.log("Filtered cards for recommendation:", filteredData);
               renderCards(filteredData);
               showHubNotification(`Found ${filteredData.length} result(s)`, "#28a745");
             } else {
@@ -932,8 +921,8 @@
             console.error("Filter error:", error);
             showHubNotification("Filter error", "#dc3545");
           })
-          .filterAppsBySearch(cleanSearchInput.value);
-        
+          .filterAppsBySearch(name); // Use the selected name for filtering
+
         cleanSuggestions.style.display = "none";
       }
     });

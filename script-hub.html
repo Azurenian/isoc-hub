@@ -101,6 +101,592 @@
           .addCommentToSheet(name, comment, cardId);
       });
 
+    const searchInput = document.getElementById("hubSearchInput");
+    const suggestions = document.getElementById("hubSearchSuggestions");
+
+    // Show recommendations as you type
+    searchInput.addEventListener("input", function () {
+      const query = this.value.trim().toLowerCase();
+      if (!query) {
+        suggestions.style.display = "none";
+        renderCards(spreadsheetData);
+        return;
+      }
+      // Filter titles for recommendations
+      const matches = spreadsheetData
+        .filter((app) => app.name && app.name.toLowerCase().includes(query))
+        .map((app) => app.name);
+
+      if (matches.length > 0) {
+        suggestions.innerHTML = matches
+          .map(
+            (title) =>
+              `<li class="list-group-item list-group-item-action" style="cursor:pointer;">${title}</li>`
+          )
+          .join("");
+        suggestions.style.display = "block";
+      } else {
+        suggestions.innerHTML = `<li class="list-group-item text-muted">No recommendations</li>`;
+        suggestions.style.display = "block";
+      }
+
+      // Live filter cards as you type
+      const filtered = spreadsheetData.filter((app) =>
+        app.name && app.name.toLowerCase().includes(query)
+      );
+      renderCards(filtered);
+    });
+
+    // When a recommendation is clicked, fill input and show only that card
+    suggestions.addEventListener("click", function (e) {
+      if (e.target && e.target.matches("li.list-group-item-action")) {
+        searchInput.value = e.target.textContent;
+        suggestions.style.display = "none";
+        // Show only the card with this title
+        const filtered = spreadsheetData.filter(
+          (app) => app.name && app.name === e.target.textContent
+        );
+        renderCards(filtered);
+      }
+    });
+
+    // Hide suggestions when input loses focus (with a slight delay for click)
+    searchInput.addEventListener("blur", function () {
+      setTimeout(() => {
+        suggestions.style.display = "none";
+      }, 150);
+    });
+    searchInput.addEventListener("focus", function () {
+      if (suggestions.innerHTML.trim() !== "") {
+        suggestions.style.display = "block";
+      }
+    });
+
+    // Optional: Pressing Enter shows only exact title match
+    searchInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const query = this.value.trim().toLowerCase();
+        if (!query) {
+          renderCards(spreadsheetData);
+          return;
+        }
+        const filtered = spreadsheetData.filter(
+          (app) => app.name && app.name.toLowerCase() === query
+        );
+        if (filtered.length > 0) {
+          renderCards(filtered);
+        } else {
+          const container = document.querySelector(".card-container");
+          container.innerHTML = `
+        <div class="col-12">
+          <div class="alert alert-warning text-center" role="alert">
+            Not available
+          </div>
+        </div>
+      `;
+        }
+        suggestions.style.display = "none";
+      }
+    });
+
     // ...existing code...
+  });
+
+  let spreadsheetData = [];
+
+  // Render cards with fade-in
+  function renderCards(data) {
+    const container = document.querySelector(".card-container");
+    container.innerHTML = "";
+    data.forEach((app, index) => {
+      const card = document.createElement("div");
+      card.className = "col-md-4 mb-3";
+      card.setAttribute("data-index", index); // <-- add this line
+      card.innerHTML = `
+        <div class="card h-100 shadow-sm border-0" data-index="${index}">
+          <div class="card-body d-flex flex-column position-relative">
+            <!-- Circle checkbox in upper right -->
+            <input type="checkbox" class="form-check-input select-card-checkbox position-absolute top-0 end-0 mt-3 me-3" data-index="${index}" style="width: 1.5em; height: 1.5em; border-radius: 50%; border: 2px solid #6366f1; box-shadow: 0 1px 4px rgba(0,0,0,0.07);" ${
+        window.selectedCardIndex === index ? "checked" : ""
+      }>
+            <h5 class="card-title fw-semibold">${app.name}</h5>
+            <p class="card-text flex-grow-1">${app.description}</p>
+            <a href="${app.link}" target="_blank" rel="noopener noreferrer"
+               class="hub-btn hub-btn-link mb-2">
+              <i class="bi bi-box-arrow-up-right"></i>
+              <span>Open Link</span>
+            </a>
+            <button type="button" class="hub-btn hub-btn-comment comment-card-btn" data-index="${index}" data-card-id="${
+        app.name
+      }">
+              <i class="bi bi-chat-dots"></i>
+              <span>Comment</span>
+            </button>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+    // Add select event listeners
+    document.querySelectorAll(".select-card-btn").forEach((btn) => {
+      btn.onclick = function () {
+        const cardDiv = btn.closest(".card.h-100");
+        const index = parseInt(btn.getAttribute("data-index"));
+        // If already selected, unselect
+        if (window.selectedCardIndex === index) {
+          cardDiv.classList.remove("border-primary", "shadow");
+          window.selectedCardIndex = undefined;
+        } else {
+          document
+            .querySelectorAll(".card.h-100")
+            .forEach((c) => c.classList.remove("border-primary", "shadow"));
+          cardDiv.classList.add("border-primary", "shadow");
+          window.selectedCardIndex = index;
+        }
+      };
+    });
+
+    document.querySelectorAll(".select-card-checkbox").forEach((checkbox) => {
+      checkbox.onchange = function () {
+        const index = parseInt(this.getAttribute("data-index"));
+        if (this.checked) {
+          // Uncheck all others
+          document.querySelectorAll(".select-card-checkbox").forEach((cb) => {
+            if (cb !== this) cb.checked = false;
+          });
+          window.selectedCardIndex = index;
+          // Optional: highlight card
+          document.querySelectorAll(".card.h-100").forEach((c, i) => {
+            c.classList.toggle("border-primary", i === index);
+            c.classList.toggle("shadow", i === index);
+          });
+        } else {
+          window.selectedCardIndex = undefined;
+          document.querySelectorAll(".card.h-100").forEach((c) => {
+            c.classList.remove("border-primary", "shadow");
+          });
+        }
+      };
+    });
+
+    addCommentButtonListeners();
+    container.style.opacity = 1;
+    document.getElementById("loading-spinner").style.display = "none";
+  }
+
+  function addCommentButtonListeners() {
+    document.querySelectorAll(".comment-card-btn").forEach((btn) => {
+      btn.onclick = function () {
+        const cardId = btn.getAttribute("data-card-id");
+        document.getElementById("commentCardId").value = cardId;
+        document.getElementById("commentForm").reset();
+        document.getElementById("recentCommentResult").innerHTML = ""; // Clear previous comments
+        commentModal.show();
+      };
+    });
+  }
+
+  // Add this helper function
+  function addOrUpdateCard(app, index) {
+    const container = document.querySelector(".card-container");
+    let colDiv = container.querySelector(
+      `.col-md-4.mb-3[data-index="${index}"]`
+    );
+    const cardHTML = `
+      <div class="card h-100 shadow-sm border-0" data-index="${index}">
+        <div class="card-body d-flex flex-column position-relative">
+          <!-- Circle checkbox in upper right -->
+          <input type="checkbox" class="form-check-input select-card-checkbox position-absolute top-0 end-0 mt-3 me-3" data-index="${index}" style="width: 1.5em; height: 1.5em; border-radius: 50%; border: 2px solid #6366f1; box-shadow: 0 1px 4px rgba(0,0,0,0.07);" ${
+      window.selectedCardIndex === index ? "checked" : ""
+    }>
+          <h5 class="card-title fw-semibold">${app.name}</h5>
+          <p class="card-text flex-grow-1">${app.description}</p>
+          <a href="${app.link}" target="_blank" rel="noopener noreferrer"
+             class="hub-btn hub-btn-link mb-2">
+            <i class="bi bi-box-arrow-up-right"></i>
+            <span>Open Link</span>
+          </a>
+          <button type="button" class="hub-btn hub-btn-comment comment-card-btn" data-index="${index}" data-card-id="${
+      app.name
+    }">
+            <i class="bi bi-chat-dots"></i>
+            <span>Comment</span>
+          </button>
+        </div>
+      </div>
+    `;
+    if (colDiv) {
+      colDiv.innerHTML = cardHTML; // Only update, do not add new for edit
+    } else if (index === spreadsheetData.length - 1) {
+      // Only add new card if it's a new entry (add mode)
+      colDiv = document.createElement("div");
+      colDiv.className = "col-md-4 mb-3";
+      colDiv.setAttribute("data-index", index);
+      colDiv.innerHTML = cardHTML;
+      container.appendChild(colDiv);
+    }
+  }
+
+  // Bootstrap modal instance
+  let appModal = null;
+  let deleteConfirmModal = null;
+  let commentModal = null;
+  let viewCommentsModal = null;
+
+  document.addEventListener("DOMContentLoaded", function () {
+    appModal = new bootstrap.Modal(document.getElementById("appModal"));
+    deleteConfirmModal = new bootstrap.Modal(
+      document.getElementById("deleteConfirmModal")
+    );
+    commentModal = new bootstrap.Modal(document.getElementById("commentModal"));
+    viewCommentsModal = new bootstrap.Modal(
+      document.getElementById("viewCommentsModal")
+    );
+
+    // Add Button
+    document
+      .querySelector('.btn-success[title="Add"]')
+      .addEventListener("click", function () {
+        document.getElementById("appModalLabel").textContent = "Add Web App";
+        document.getElementById("appForm").reset();
+        document.getElementById("editIndex").value = "";
+        appModal.show();
+      });
+
+    // Edit Button
+    document
+      .querySelector('.btn-warning[title="Edit"]')
+      .addEventListener("click", function () {
+        const index = window.selectedCardIndex;
+        if (index === undefined) {
+          showHubNotification("Please select a card to edit.", "#ffc107");
+          return;
+        }
+        const app = spreadsheetData[index];
+        document.getElementById("appName").value = app.name;
+        document.getElementById("appLink").value = app.link;
+        document.getElementById("appDescription").value = app.description;
+        document.getElementById("editIndex").value = index;
+        appModal.show();
+      });
+
+    // Delete Button
+    document
+      .querySelector('.btn-danger[title="Delete"]')
+      .addEventListener("click", function () {
+        const index = window.selectedCardIndex;
+        if (index === undefined) {
+          showHubNotification("Please select a card to delete.", "#dc3545");
+          return;
+        }
+        pendingDeleteIndex = index;
+        deleteConfirmModal.show();
+      });
+
+    // Confirm Delete in Modal
+    document.getElementById("confirmDeleteBtn").onclick = function () {
+      if (pendingDeleteIndex !== null) {
+        google.script.run
+          .withSuccessHandler(function () {
+            showHubNotification("Web App deleted successfully!");
+            window.selectedCardIndex = undefined;
+            loadWebApps(); // <-- This reloads and re-renders the cards, removing the deleted one
+          })
+          .withFailureHandler(function (err) {
+            showHubNotification("Failed to delete: " + err.message, "#dc3545");
+          })
+          .deleteWebAppFromSheet(pendingDeleteIndex);
+        pendingDeleteIndex = null;
+        deleteConfirmModal.hide();
+      }
+    };
+
+    // Refresh Button
+    document
+      .querySelector('.btn-info[title="Refresh"]')
+      .addEventListener("click", function () {
+        window.selectedCardIndex = undefined;
+        loadWebApps();
+      });
+
+    // Handle form submit for Add/Edit
+    document.getElementById("appForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("appName").value.trim();
+      const link = document.getElementById("appLink").value.trim();
+      const description = document
+        .getElementById("appDescription")
+        .value.trim();
+      const editIndex = document.getElementById("editIndex").value;
+
+      if (editIndex === "") {
+        google.script.run
+          .withSuccessHandler(function () {
+            showHubNotification("Added successfully!");
+            // Add new card to local data and render only the new card
+            const newApp = { name, link, description };
+            spreadsheetData.push(newApp);
+            addOrUpdateCard(newApp, spreadsheetData.length - 1);
+            // Fade in the container if needed
+            document.querySelector(".card-container").style.opacity = 1;
+            // After successful add
+            window.selectedCardIndex = undefined;
+            renderCards(spreadsheetData);
+          })
+          .withFailureHandler(function (err) {
+            showHubNotification("Failed to add: " + err.message, "#dc3545");
+          })
+          .addWebAppToSheet(name, link, description);
+      } else {
+        // Edit mode
+        google.script.run
+          .withSuccessHandler(function () {
+            spreadsheetData[editIndex] = { name, link, description };
+            renderCards(spreadsheetData);
+            // After successful edit
+            window.selectedCardIndex = undefined;
+            renderCards(spreadsheetData);
+            showHubNotification("Updated successfully!");
+          })
+          .editWebAppInSheet(editIndex, name, link, description);
+      }
+      appModal.hide();
+    });
+
+    // Load web apps from spreadsheet
+    function loadWebApps() {
+      document.querySelector(".card-container").style.opacity = 0;
+      document.getElementById("loading-spinner").style.display = "flex";
+      google.script.run
+        .withSuccessHandler(function (data) {
+          spreadsheetData = data;
+          renderCards(spreadsheetData);
+        })
+        .withFailureHandler(function (err) {
+          showHubNotification("Failed to load data: " + err.message, "#dc3545");
+          document.getElementById("loading-spinner").style.display = "none";
+        })
+        .getWebAppsFromSheet();
+    }
+
+    // Load web apps from spreadsheet
+    loadWebApps(); // Only call this ONCE here!
+  });
+
+  // Place this outside DOMContentLoaded so it can access commentModal
+  document
+    .getElementById("commentForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("commentName").value.trim();
+      const comment = document.getElementById("commentText").value.trim();
+      const cardId = document.getElementById("commentCardId").value;
+
+      if (!name || !comment) {
+        showHubNotification("Please enter your name and comment.", "#dc3545");
+        return;
+      }
+
+      // Close the modal immediately
+      commentModal.hide();
+      google.script.run
+        .withSuccessHandler(function () {
+          showHubNotification("Comment submitted!");
+        })
+        .withFailureHandler(function (err) {
+          showHubNotification(
+            "Failed to submit comment: " + err.message,
+            "#dc3545"
+          );
+        })
+        .addCommentToSheet(name, comment, cardId);
+    });
+
+  // Handle photo preview in modal
+  document.getElementById("appPhoto").addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById("photoPreview");
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        preview.src = evt.target.result;
+        preview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.src = "";
+      preview.style.display = "none";
+    }
+  });
+
+  // Smooth notification function
+  function showHubNotification(message, color = "#198754") {
+    const bar = document.getElementById("hub-notification-bar");
+    bar.textContent = message;
+    bar.style.background = color;
+    bar.style.display = "block";
+    bar.style.opacity = 0;
+    bar.style.top = "24px";
+    setTimeout(() => {
+      bar.style.opacity = 1;
+      bar.style.top = "40px";
+    }, 10);
+    setTimeout(() => {
+      bar.style.opacity = 0;
+      bar.style.top = "24px";
+      setTimeout(() => {
+        bar.style.display = "none";
+      }, 400);
+    }, 2500); // Notification visible for 2.5 seconds
+  }
+
+  // Alternative approach using Imgur API for image hosting
+  function uploadToImgur(base64Image) {
+    return new Promise((resolve, reject) => {
+      // Remove the "data:image/jpeg;base64," part
+      const base64Data = base64Image.split(",")[1];
+
+      fetch("https://api.imgur.com/3/image", {
+        method: "POST",
+        headers: {
+          Authorization: "Client-ID YOUR_IMGUR_CLIENT_ID", // Replace with your Client ID
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          image: base64Data,
+          type: "base64",
+        }),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result.success) {
+            resolve(result.data.link);
+          } else {
+            reject(new Error("Imgur upload failed: " + result.message));
+          }
+        })
+        .catch((error) =>
+          reject(new Error("Imgur upload error: " + error.message))
+        );
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Apply futuristic styling to buttons
+    const openLinkBtns = document.querySelectorAll(".btn-outline-primary");
+    const selectBtns = document.querySelectorAll(".btn-outline-secondary");
+    const commentBtns = document.querySelectorAll(".btn-outline-info");
+
+    openLinkBtns.forEach((btn) => {
+      btn.classList.add("btn-futuristic", "btn-link-futuristic");
+      btn.innerHTML = `<i class="bi bi-box-arrow-up-right"></i> Open Link`;
+    });
+
+    selectBtns.forEach((btn) => {
+      btn.classList.add("btn-futuristic", "btn-select-futuristic");
+      btn.innerHTML = `<i class="bi bi-check-circle"></i> Select`;
+
+      // Handle selection visual feedback
+      btn.addEventListener("click", function () {
+        const wasSelected = this.classList.contains("selected");
+        document.querySelectorAll(".select-card-btn").forEach((b) => {
+          b.classList.remove("selected");
+        });
+        if (!wasSelected) {
+          this.classList.add("selected");
+        }
+      });
+    });
+
+    commentBtns.forEach((btn) => {
+      btn.classList.add("btn-futuristic", "btn-comment-futuristic");
+      btn.innerHTML = `<i class="bi bi-chat-dots"></i> Comment`;
+    });
+  });
+
+  // New function to fetch and display comments for a specific card
+  function viewComments(cardId) {
+    const container = document.getElementById("viewCommentsBody");
+    container.innerHTML = ""; // Clear existing content
+
+    // Fetch comments from the server
+    google.script.run
+      .withSuccessHandler(function (comments) {
+        if (comments.length > 0) {
+          container.innerHTML = comments
+            .map(
+              (comment) => `
+              <div class="bg-light p-3 rounded mb-2">
+                <div class="fw-semibold">${comment.name}</div>
+                <div style="font-size:0.98em;">${comment.comment}</div>
+                <div class="text-muted" style="font-size:0.85em;">${
+                  comment.date || ""
+                }</div>
+              </div>
+            `
+            )
+            .join("");
+        } else {
+          container.innerHTML = `<div class="text-muted">No comments yet.</div>`;
+        }
+        viewCommentsModal.show();
+      })
+      .getCommentsForCard(cardId);
+  }
+
+  document.getElementById("seeRecentCommentBtn").onclick = function () {
+    const cardId = document.getElementById("commentCardId").value;
+    // Show modal immediately for no delay UX
+    viewCommentsModal.show();
+    // Clear and fade out body before loading
+    const container = document.getElementById("viewCommentsBody");
+    container.style.opacity = 0;
+    container.style.transform = "translateY(16px)";
+    container.innerHTML = `<div class="text-muted">Loading comments...</div>`;
+    // Fetch comments
+    google.script.run
+      .withSuccessHandler(function (comments) {
+        if (comments && comments.length > 0) {
+          container.innerHTML = comments
+            .map(
+              (comment) => `
+          <div class="border rounded p-2 bg-light mb-2">
+            <div class="fw-semibold" style="font-size:0.97em;">${
+              comment.name
+            }</div>
+            <div style="font-size:0.98em;">${comment.comment}</div>
+            <div class="text-muted" style="font-size:0.85em;">${
+              comment.date || ""
+            }</div>
+          </div>
+        `
+            )
+            .join("");
+        } else {
+          container.innerHTML = `<div class="text-muted">No comments yet.</div>`;
+        }
+        // Smooth fade-in after content is set
+        setTimeout(() => {
+          container.style.opacity = 1;
+          container.style.transform = "translateY(0)";
+        }, 10);
+      })
+      .getCommentsForCard(cardId);
+  };
+
+  // Filter and render cards based on search input
+  document.getElementById("hubSearchInput").addEventListener("input", function () {
+    const query = this.value.trim().toLowerCase();
+    if (!query) {
+      renderCards(spreadsheetData);
+      return;
+    }
+    const filtered = spreadsheetData.filter(app =>
+      (app.name && app.name.toLowerCase().includes(query)) ||
+      (app.description && app.description.toLowerCase().includes(query))
+    );
+    renderCards(filtered);
   });
 </script>

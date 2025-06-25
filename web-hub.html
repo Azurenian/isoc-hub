@@ -451,6 +451,45 @@
   "
 ></div>
 
+<!-- Activity Notifications Modal -->
+<div
+  class="modal fade"
+  id="activityModal"
+  tabindex="-1"
+  aria-labelledby="activityModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="activityModalLabel">
+          <i class="bi bi-bell"></i> Recent Activities
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body" id="activityBody">
+        <div class="text-center text-muted">
+          <i class="bi bi-clock-history fs-1"></i>
+          <p class="mt-2">Loading recent activities...</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" id="clearActivitiesBtn">
+          <i class="bi bi-trash"></i> Clear All
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Bootstrap Icons CDN (for button icons) -->
 <link
   rel="stylesheet"
@@ -878,11 +917,8 @@
       const listItem = e.target.closest("li.list-group-item-action");
       if (listItem) {
         const name = listItem.getAttribute("data-name");
-        const link = listItem.getAttribute("data-link");
-        const id = listItem.getAttribute("data-id");
-        const type = listItem.getAttribute("data-type");
         
-        console.log("Suggestion clicked:", {name, link, id, type});
+        console.log("Suggestion clicked:", {name});
         
         // Update search input
         if (type === 'id') {
@@ -1059,6 +1095,7 @@
     });
   });
 
+  // New function to fetch and display comments for a specific card
   function viewComments(cardId) {
     const container = document.getElementById("viewCommentsBody");
     container.innerHTML = ""; // Clear existing content
@@ -1156,25 +1193,17 @@
     // Only recommend card titles (name) that match the query
     const recommendations = spreadsheetData
       .filter(app => (app.name || '').toLowerCase().includes(query))
-      .map(app => ({
-        text: app.name,
-        data: app
-      }))
-      // Remove duplicates by name
-      .filter((item, index, self) =>
-        index === self.findIndex(t => t.text === item.text)
-      )
+      .map(app => app.name)
+      .filter((name, idx, arr) => arr.indexOf(name) === idx) // Remove duplicates
       .slice(0, 5);
 
     if (recommendations.length > 0) {
       suggestions.innerHTML = recommendations
-        .map(rec => `
-          <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" 
-              style="cursor: pointer; border-bottom: 1px solid #e9ecef;" 
-              data-name="${rec.data.name}">
-            <div>
-              <div class="fw-medium" style="font-size: 0.95rem;">${rec.text}</div>
-            </div>
+        .map(name => `
+          <li class="list-group-item list-group-item-action" 
+              style="cursor: pointer;" 
+              data-name="${name}">
+            <div class="fw-medium" style="font-size: 0.95rem;">${name}</div>
           </li>
         `).join("");
       suggestions.style.display = "block";
@@ -1258,4 +1287,11 @@
       document.getElementById("hubSearchSuggestions").style.display = "none";
     }
   });
+
+  // Notification Button
+  document
+    .getElementById("notificationBtn")
+    .addEventListener("click", function () {
+      showHubNotification("This is a test notification! 🔔", "#6f42c1");
+    });
 </script>

@@ -1288,13 +1288,13 @@
     const listItem = e.target.closest("li.list-group-item-action");
     if (listItem) {
       const name = listItem.getAttribute("data-name");
-      // Filter cards by exact name match (case-insensitive)
-      const filtered = spreadsheetData.filter(app =>
-        (app.name || '').toLowerCase().includes(name.toLowerCase())
-      );
-      renderCards(filtered);
       // Set the search input to the clicked name
       document.getElementById("hubSearchInput").value = name;
+      // Filter cards by exact name match (case-insensitive)
+      const filtered = spreadsheetData.filter(app =>
+        (app.name || '').toLowerCase() === name.toLowerCase()
+      );
+      renderCards(filtered);
       // Hide the suggestions
       this.style.display = "none";
     }

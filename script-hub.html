@@ -129,36 +129,6 @@
         suggestions.style.display = "block";
       }
     });
-
-    // Optional: Pressing Enter shows only exact title match
-    /*searchInput.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const query = this.value.trim().toLowerCase();
-        if (!query) {
-          renderCards(spreadsheetData);
-          return;
-        }
-        const filtered = spreadsheetData.filter(
-          (app) => app.name && app.name.toLowerCase() === query
-        );
-        if (filtered.length > 0) {
-          renderCards(filtered);
-        } else {
-          const container = document.querySelector(".card-container");
-          container.innerHTML = `
-        <div class="col-12">
-          <div class="alert alert-warning text-center" role="alert">
-            Not available
-          </div>
-        </div>
-      `;
-        }
-        suggestions.style.display = "none";
-      }
-    });*/
-
-    // ...existing code...
   });
 
   let spreadsheetData = [];
@@ -656,5 +626,59 @@
       (app.description && app.description.toLowerCase().includes(query))
     );
     renderCards(filtered);
+  });
+
+   // Add this to your existing script section
+  document.addEventListener('DOMContentLoaded', function() {
+    // Apply futuristic styling to buttons
+    const openLinkBtns = document.querySelectorAll('.btn-outline-primary');
+    const selectBtns = document.querySelectorAll('.btn-outline-secondary');
+    const commentBtns = document.querySelectorAll('.btn-outline-info');
+    
+    openLinkBtns.forEach(btn => {
+      btn.classList.add('btn-futuristic', 'btn-link-futuristic');
+      btn.innerHTML = `<i class="bi bi-box-arrow-up-right"></i> Open Link`;
+    });
+    
+    selectBtns.forEach(btn => {
+      btn.classList.add('btn-futuristic', 'btn-select-futuristic');
+      btn.innerHTML = `<i class="bi bi-check-circle"></i> Select`;
+      
+      // Handle selection visual feedback
+      btn.addEventListener('click', function() {
+        const wasSelected = this.classList.contains('selected');
+        document.querySelectorAll('.select-card-btn').forEach(b => {
+          b.classList.remove('selected');
+        });
+        if (!wasSelected) {
+          this.classList.add('selected');
+        }
+      });
+    });
+    
+    commentBtns.forEach(btn => {
+      btn.classList.add('btn-futuristic', 'btn-comment-futuristic');
+      btn.innerHTML = `<i class="bi bi-chat-dots"></i> Comment`;
+    });
+    
+    // Add ripple effect to all buttons
+    document.querySelectorAll('.btn-futuristic').forEach(button => {
+      button.addEventListener('click', function(e) {
+        let ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        this.appendChild(ripple);
+        
+        // Position the ripple
+        let x = e.clientX - this.getBoundingClientRect().left;
+        let y = e.clientY - this.getBoundingClientRect().top;
+        
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      });
+    });
   });
 </script>

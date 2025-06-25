@@ -29,7 +29,7 @@
               type="text"
               id="hubSearchInput"
               class="form-control border-start-0"
-              placeholder="Search by name, ID, or link..."
+              placeholder="Search by name"
               aria-label="Search"
               style="border-radius: 0 8px 8px 0; background: #f8f9fa;"
             />
@@ -1281,5 +1281,20 @@
       
       document.getElementById("hubSearchSuggestions").style.display = "none";
     }
+  });
+
+  searchInput.addEventListener("input", function () {
+    suggestions.style.display = "none"; // Hide recommendations immediately
+
+    const query = this.value.trim().toLowerCase();
+    // Filter cards as you type
+    if (!query) {
+      renderCards(spreadsheetData);
+      return;
+    }
+    const filtered = spreadsheetData.filter(app =>
+      app.name && app.name.toLowerCase().includes(query)
+    );
+    renderCards(filtered);
   });
 </script>

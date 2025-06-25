@@ -59,6 +59,9 @@
           <button type="button" class="btn btn-info" title="Refresh">
             <i class="bi bi-arrow-clockwise"></i> Refresh
           </button>
+          <button type="button" class="btn btn-secondary" title="Notifications" id="notificationBtn">
+            <i class="bi bi-bell"></i> Notifications
+          </button>
         </div>
       </div>
       <!-- Loading Spinner -->
@@ -1056,7 +1059,6 @@
     });
   });
 
-  // New function to fetch and display comments for a specific card
   function viewComments(cardId) {
     const container = document.getElementById("viewCommentsBody");
     container.innerHTML = ""; // Clear existing content
@@ -1190,7 +1192,7 @@
   document.getElementById("hubSearchInput").addEventListener("blur", function () {
     setTimeout(() => {
       document.getElementById("hubSearchSuggestions").style.display = "none";
-    }, 200); // Delay to allow click on suggestions
+    }, 100); // Delay to allow click on suggestions
   });
 
   document.getElementById("hubSearchInput").addEventListener("focus", function () {

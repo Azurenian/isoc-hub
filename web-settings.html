@@ -21,59 +21,84 @@
   <div class="container-fluid" style="margin-top: 40px;">
     <div class="card shadow-sm w-100" style="border-radius: 12px;">
       <div class="card-body px-4 py-4">
-        <h2 class="card-title mb-4" style="font-size: 2rem;">Google Sheet Connection</h2>
+        <h2 class="card-title mb-4" style="font-size: 2rem;">
+          📊 Google Sheet Connection
+        </h2>
+        <p class="text-muted mb-4">Connect to a Google Sheet containing your submarine cable system data.</p>
 
         <div class="mb-3">
-          <label for="spreadsheet-id-input" class="form-label">Spreadsheet ID</label>
+          <label for="google-sheet-input" class="form-label">Google Sheet Link or ID</label>
           <input
             type="text"
             class="form-control form-control-lg"
-            id="spreadsheet-id-input"
-            placeholder="Enter Spreadsheet ID"
+            id="google-sheet-input"
+            placeholder="Enter Google Sheet ID or URL"
           />
+          <div class="form-text">
+            Paste a Google Sheet URL or its ID (found in the URL between /d/ and /edit)
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mb-4">
           <button
-            id="search-by-id-btn"
-            class="btn btn-primary w-100 mt-2 btn-lg"
+            id="remove-connection-btn"
+            class="btn btn-outline-danger btn-lg"
             type="button"
           >
-            Search by Spreadsheet ID
+            🗑️ Remove Connection
+          </button>
+          <button
+            id="save-apply-btn"
+            class="btn btn-primary btn-lg flex-fill"
+            type="button"
+          >
+            Save & Apply
           </button>
         </div>
+
+        <div id="connection-status" class="mt-3"></div>
+
+        <!-- Data Sheet Name Section -->
+        <hr class="my-4">
+        
+        <h3 class="mb-3" style="font-size: 1.5rem;">
+          📋 Data Sheet Name
+        </h3>
+        <p class="text-muted mb-3">Specify the name of the sheet containing your incident data.</p>
+
         <div class="mb-3">
           <label for="sheet-name-input" class="form-label">Sheet Name</label>
           <input
             type="text"
             class="form-control form-control-lg"
             id="sheet-name-input"
-            placeholder="Enter Sheet Name"
+            placeholder="e.g., MAJOR INCIDENTS_UPDATED"
           />
+          <div class="form-text">
+            Enter the exact name of the sheet tab containing your data
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mb-3">
           <button
-            id="search-by-name-btn"
-            class="btn btn-primary w-100 mt-2 btn-lg"
+            id="reset-default-btn"
+            class="btn btn-outline-secondary btn-lg"
             type="button"
           >
-            Search by Sheet Name
+            🔄 Reset to Default
+          </button>
+          <button
+            id="save-sheet-name-btn"
+            class="btn btn-primary btn-lg flex-fill"
+            type="button"
+          >
+            Save
           </button>
         </div>
-        <div id="sheet-info-status" class="mt-2"></div>
 
-        <!-- Table for displaying fetched data -->
-        <div id="sheet-data-container" class="mt-4" style="display: none">
-          <h5 class="fw-semibold mb-3" style="font-size: 1.1rem; color: #222">
-            Sheet Data Overview
-          </h5>
-          <div class="table-responsive">
-            <table id="sheet-data-table" class="table table-sm">
-              <thead>
-                <tr style="background: #f8f9fa">
-                  <th style="font-weight: 500; color: #333">ID</th>
-                  <th style="font-weight: 500; color: #333">Link</th>
-                  <th style="font-weight: 500; color: #333">Description</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+        <!-- Current Sheet Status -->
+        <div class="alert alert-info" role="alert">
+          <strong>ℹ️ Current Sheet Name:</strong> <span id="current-sheet-name">TRACKER</span>
         </div>
       </div>
     </div>
@@ -93,72 +118,107 @@
         }, 3000);
       }
 
-      function renderSingleRow(data) {
-        const container = document.getElementById("sheet-data-container");
-        const table = document.getElementById("sheet-data-table");
-        if (!data) {
-          container.style.display = "none";
-          return;
+      function extractSpreadsheetId(input) {
+        // If it's already just an ID, return it
+        if (input.match(/^[a-zA-Z0-9-_]+$/)) {
+          return input;
         }
-        const thead = table.querySelector("thead");
-        thead.innerHTML = "<tr><th>ID</th><th>Link</th><th>Description</th></tr>";
-        const tbody = table.querySelector("tbody");
-        tbody.innerHTML = `<tr>
-          <td>${data.id}</td>
-          <td>
-            <a href="${data.link}" target="_blank" rel="noopener" style="color:#2563eb;word-break:break-all;">
-              ${data.link}
-            </a>
-          </td>
-          <td>${data.description}</td>
-        </tr>`;
-        container.style.display = "";
+        
+        // Extract ID from URL
+        const match = input.match(/\/d\/([a-zA-Z0-9-_]+)/);
+        return match ? match[1] : null;
       }
 
-      function fetchById() {
-        const id = document.getElementById("spreadsheet-id-input").value.trim();
-        if (!id) {
-          showNotification("Please enter a Spreadsheet ID.", "#dc3545");
+      function saveGoogleSheetConnection() {
+        const input = document.getElementById("google-sheet-input").value.trim();
+        if (!input) {
+          showNotification("Please enter a Google Sheet URL or ID.", "#dc3545");
           return;
         }
-        document.getElementById("sheet-info-status").textContent = "Searching...";
+
+        const spreadsheetId = extractSpreadsheetId(input);
+        if (!spreadsheetId) {
+          showNotification("Invalid Google Sheet URL or ID format.", "#dc3545");
+          return;
+        }
+
+        document.getElementById("connection-status").innerHTML = 
+          '<div class="spinner-border spinner-border-sm me-2" role="status"></div>Connecting...';
+
+        // Call backend function to save the connection
         google.script.run
-          .withSuccessHandler(function (data) {
-            document.getElementById("sheet-info-status").textContent = "";
-            renderSingleRow(data);
+          .withSuccessHandler(function (result) {
+            document.getElementById("connection-status").innerHTML = 
+              '<div class="alert alert-success mb-0">✅ Connection saved successfully!</div>';
+            showNotification("Google Sheet connection saved!", "#28a745");
           })
           .withFailureHandler(function (err) {
-            document.getElementById("sheet-info-status").textContent =
-              "Error: " + err.message;
-            document.getElementById("sheet-data-container").style.display =
-              "none";
+            document.getElementById("connection-status").innerHTML = 
+              '<div class="alert alert-danger mb-0">❌ Error: ' + err.message + '</div>';
+            showNotification("Failed to save connection: " + err.message, "#dc3545");
           })
-          .findRowBySpreadsheetId(id);
+          .saveSpreadsheetId(spreadsheetId);
       }
 
-      function fetchByName() {
-        const name = document.getElementById("sheet-name-input").value.trim();
-        if (!name) {
-          showNotification("Please enter a Sheet Name.", "#dc3545");
+      function removeConnection() {
+        if (confirm('Are you sure you want to remove the Google Sheet connection?')) {
+          document.getElementById("google-sheet-input").value = '';
+          document.getElementById("connection-status").innerHTML = 
+            '<div class="alert alert-warning mb-0">⚠️ Connection removed</div>';
+          showNotification("Google Sheet connection removed.", "#ffc107");
+        }
+      }
+
+      function saveSheetName() {
+        const sheetName = document.getElementById("sheet-name-input").value.trim();
+        if (!sheetName) {
+          showNotification("Please enter a sheet name.", "#dc3545");
           return;
         }
-        document.getElementById("sheet-info-status").textContent = "Searching...";
-        google.script.run
-          .withSuccessHandler(function (data) {
-            document.getElementById("sheet-info-status").textContent = "";
-            renderSingleRow(data);
-          })
-          .withFailureHandler(function (err) {
-            document.getElementById("sheet-info-status").textContent =
-              "Error: " + err.message;
-            document.getElementById("sheet-data-container").style.display =
-              "none";
-          })
-          .findRowBySheetName(name); // This must match the Apps Script function name
+
+        // Update the current sheet name display
+        document.getElementById("current-sheet-name").textContent = sheetName;
+        showNotification("Sheet name saved successfully!", "#28a745");
+        
+        // Clear the input
+        document.getElementById("sheet-name-input").value = '';
       }
 
-      document.getElementById("search-by-id-btn").onclick = fetchById;
-      document.getElementById("search-by-name-btn").onclick = fetchByName;
+      function resetToDefault() {
+        if (confirm('Reset sheet name to default (TRACKER)?')) {
+          document.getElementById("current-sheet-name").textContent = "TRACKER";
+          document.getElementById("sheet-name-input").value = '';
+          showNotification("Sheet name reset to default.", "#17a2b8");
+        }
+      }
+
+      // Event listeners
+      document.getElementById("save-apply-btn").onclick = saveGoogleSheetConnection;
+      document.getElementById("remove-connection-btn").onclick = removeConnection;
+      document.getElementById("save-sheet-name-btn").onclick = saveSheetName;
+      document.getElementById("reset-default-btn").onclick = resetToDefault;
+
+      // Add CSS for notification animation
+      const style = document.createElement('style');
+      style.textContent = `
+        #notification-bar {
+          transition: opacity 0.4s ease;
+          opacity: 0;
+        }
+        #notification-bar.show {
+          opacity: 1;
+        }
+        .d-flex {
+          display: flex !important;
+        }
+        .gap-2 {
+          gap: 0.5rem !important;
+        }
+        .flex-fill {
+          flex: 1 1 auto !important;
+        }
+      `;
+      document.head.appendChild(style);
     </script>
   </div>
 </div>

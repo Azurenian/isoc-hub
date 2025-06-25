@@ -811,23 +811,10 @@
 
             cleanSuggestions.innerHTML = uniqueSuggestions
               .map(rec => `
-                <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" 
-                    style="cursor: pointer; border-bottom: 1px solid #e9ecef;" 
-                    data-name="${rec.name}" 
-                    data-link="${rec.link}"
-                    data-id="${rec.id}"
-                    data-type="${rec.matchType}">
-                  <div>
-                    <div class="fw-medium" style="font-size: 0.95rem;">
-                      ${rec.matchType === 'id' ? `ID: ${rec.id}` : 
-                        rec.matchType === 'link' ? `Link: ${rec.link}` : 
-                        rec.name}
-                    </div>
-                    <small class="text-muted">${rec.name}</small>
-                  </div>
-                  <span class="badge bg-${rec.matchType === 'id' ? 'primary' : rec.matchType === 'link' ? 'success' : 'secondary'} rounded-pill" style="font-size: 0.7rem;">
-                    ${rec.matchType.toUpperCase()}
-                  </span>
+                <li class="list-group-item list-group-item-action" 
+                    style="cursor: pointer;" 
+                    data-name="${rec.name}">
+                  <div class="fw-medium" style="font-size: 0.95rem;">${rec.name}</div>
                 </li>
               `).join("");
             cleanSuggestions.style.display = "block";

@@ -45,7 +45,7 @@
     }, 2500);
   }
 
-  let commentModal = null;
+  // let commentModal = null; // Removed duplicate declaration
 
   document.addEventListener("DOMContentLoaded", function () {
     // ...existing code...
@@ -163,7 +163,7 @@
     });
 
     // Optional: Pressing Enter shows only exact title match
-    searchInput.addEventListener("keydown", function (e) {
+    /*searchInput.addEventListener("keydown", function (e) {
       if (e.key === "Enter") {
         e.preventDefault();
         const query = this.value.trim().toLowerCase();
@@ -188,7 +188,7 @@
         }
         suggestions.style.display = "none";
       }
-    });
+    });*/
 
     // ...existing code...
   });

@@ -18,7 +18,7 @@
       <!-- Controls Row: Search Bar (left), Buttons (right) -->
       <div class="row mb-4">
         <div class="col-md-6 col-12 mb-2 mb-md-0">
-          <div class="input-group shadow-sm" style="max-width: 320px;">
+          <div class="input-group shadow-sm position-relative" style="max-width: 320px;">
             <span
               class="input-group-text bg-white border-end-0"
               style="border-radius: 8px 0 0 8px;"
@@ -29,10 +29,21 @@
               type="text"
               id="hubSearchInput"
               class="form-control border-start-0"
-              placeholder="Search web apps..."
+              placeholder="Search by name, ID, or link..."
               aria-label="Search"
               style="border-radius: 0 8px 8px 0; background: #f8f9fa;"
             />
+            <!-- Search Recommendations Dropdown -->
+            <ul id="hubSearchSuggestions" class="list-group position-absolute w-100" style="
+              top: 100%;
+              z-index: 1050;
+              display: none;
+              max-height: 200px;
+              overflow-y: auto;
+              border-radius: 0 0 8px 8px;
+              border-top: none;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            "></ul>
           </div>
         </div>
         <div class="col-md-6 col-12 d-flex justify-content-md-end justify-content-start gap-2">
@@ -724,6 +735,194 @@
 
     // Load web apps from spreadsheet
     loadWebApps(); // Only call this ONCE here!
+
+    const searchInput = document.getElementById("hubSearchInput");
+    const suggestions = document.getElementById("hubSearchSuggestions");
+    
+    // Clear any existing search functionality
+    const existingInputHandler = searchInput.cloneNode(true);
+    searchInput.parentNode.replaceChild(existingInputHandler, searchInput);
+    const cleanSearchInput = document.getElementById("hubSearchInput");
+    const cleanSuggestions = document.getElementById("hubSearchSuggestions");
+
+    // Search input handler for real-time suggestions from Google Sheets
+    cleanSearchInput.addEventListener("input", function () {
+      const query = this.value.trim();
+      
+      if (!query) {
+        cleanSuggestions.style.display = "none";
+        renderCards(spreadsheetData);
+        return;
+      }
+
+      // Get suggestions from Google Sheets
+      google.script.run
+        .withSuccessHandler(function(suggestionsData) {
+          console.log("Received suggestions:", suggestionsData);
+          
+          if (suggestionsData && suggestionsData.length > 0) {
+            const uniqueSuggestions = suggestionsData
+              .filter((item, index, self) => 
+                index === self.findIndex(t => t.name === item.name)
+              )
+              .slice(0, 5);
+
+            cleanSuggestions.innerHTML = uniqueSuggestions
+              .map(rec => `
+                <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" 
+                    style="cursor: pointer; border-bottom: 1px solid #e9ecef;" 
+                    data-name="${rec.name}" 
+                    data-link="${rec.link}"
+                    data-id="${rec.id}"
+                    data-type="${rec.matchType}">
+                  <div>
+                    <div class="fw-medium" style="font-size: 0.95rem;">
+                      ${rec.matchType === 'id' ? `ID: ${rec.id}` : 
+                        rec.matchType === 'link' ? `Link: ${rec.link}` : 
+                        rec.name}
+                    </div>
+                    <small class="text-muted">${rec.name}</small>
+                  </div>
+                  <span class="badge bg-${rec.matchType === 'id' ? 'primary' : rec.matchType === 'link' ? 'success' : 'secondary'} rounded-pill" style="font-size: 0.7rem;">
+                    ${rec.matchType.toUpperCase()}
+                  </span>
+                </li>
+              `).join("");
+            cleanSuggestions.style.display = "block";
+          } else {
+            cleanSuggestions.innerHTML = `
+              <li class="list-group-item text-muted text-center" style="font-style: italic;">
+                No recommendations found
+              </li>
+            `;
+            cleanSuggestions.style.display = "block";
+          }
+        })
+        .withFailureHandler(function(error) {
+          console.error("Error getting suggestions:", error);
+          cleanSuggestions.innerHTML = `
+            <li class="list-group-item text-danger text-center">
+              Error loading suggestions
+            </li>
+          `;
+          cleanSuggestions.style.display = "block";
+        })
+        .getSearchSuggestions(query);
+
+      // Also filter locally for immediate feedback
+      const localFiltered = spreadsheetData.filter(app => {
+        const name = (app.name || '').toLowerCase();
+        const link = (app.link || '').toLowerCase();
+        const description = (app.description || '').toLowerCase();
+        const id = (app.id || '').toLowerCase();
+        
+        return name.includes(query.toLowerCase()) || 
+               link.includes(query.toLowerCase()) || 
+               description.includes(query.toLowerCase()) || 
+               id.includes(query.toLowerCase());
+      });
+      renderCards(localFiltered);
+    });
+
+    // Handle Enter key
+    cleanSearchInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const query = this.value.trim();
+        
+        console.log("Enter pressed with query:", query);
+        
+        if (!query) {
+          renderCards(spreadsheetData);
+          cleanSuggestions.style.display = "none";
+          return;
+        }
+
+        // Search in Google Sheets
+        google.script.run
+          .withSuccessHandler(function(results) {
+            console.log("Search results:", results);
+            if (results && results.length > 0) {
+              renderCards(results);
+              showHubNotification(`Found ${results.length} result(s)`, "#28a745");
+            } else {
+              renderCards([]);
+              const container = document.querySelector(".card-container");
+              container.innerHTML = `
+                <div class="col-12">
+                  <div class="alert alert-warning text-center" role="alert">
+                    <i class="bi bi-search"></i>
+                    <h5 class="mt-2">No results found</h5>
+                    <p class="mb-0">No web apps match: "${query}"</p>
+                  </div>
+                </div>
+              `;
+              showHubNotification("No results found", "#ffc107");
+            }
+          })
+          .withFailureHandler(function(error) {
+            console.error("Search error:", error);
+            showHubNotification("Search error", "#dc3545");
+          })
+          .filterAppsBySearch(query);
+        
+        cleanSuggestions.style.display = "none";
+      }
+    });
+
+    // Handle suggestion clicks
+    cleanSuggestions.addEventListener("click", function (e) {
+      const listItem = e.target.closest("li.list-group-item-action");
+      if (listItem) {
+        const name = listItem.getAttribute("data-name");
+        const link = listItem.getAttribute("data-link");
+        const id = listItem.getAttribute("data-id");
+        const type = listItem.getAttribute("data-type");
+        
+        console.log("Suggestion clicked:", {name, link, id, type});
+        
+        // Update search input
+        if (type === 'id') {
+          cleanSearchInput.value = id;
+        } else if (type === 'link') {
+          cleanSearchInput.value = link;
+        } else {
+          cleanSearchInput.value = name;
+        }
+        
+        // Filter data
+        google.script.run
+          .withSuccessHandler(function(filteredData) {
+            if (filteredData && filteredData.length > 0) {
+              renderCards(filteredData);
+              showHubNotification(`Found ${filteredData.length} result(s)`, "#28a745");
+            } else {
+              renderCards([]);
+              showHubNotification("No results found", "#ffc107");
+            }
+          })
+          .withFailureHandler(function(error) {
+            console.error("Filter error:", error);
+            showHubNotification("Filter error", "#dc3545");
+          })
+          .filterAppsBySearch(cleanSearchInput.value);
+        
+        cleanSuggestions.style.display = "none";
+      }
+    });
+
+    // Handle focus/blur
+    cleanSearchInput.addEventListener("blur", function () {
+      setTimeout(() => {
+        cleanSuggestions.style.display = "none";
+      }, 200);
+    });
+
+    cleanSearchInput.addEventListener("focus", function () {
+      if (cleanSuggestions.innerHTML.trim() !== "" && this.value.trim() !== "") {
+        cleanSuggestions.style.display = "block";
+      }
+    });
   });
 
   // Place this outside DOMContentLoaded so it can access commentModal
@@ -930,14 +1129,157 @@
   // Filter and render cards based on search input
   document.getElementById("hubSearchInput").addEventListener("input", function () {
     const query = this.value.trim().toLowerCase();
+    const suggestions = document.getElementById("hubSearchSuggestions");
+    
     if (!query) {
+      suggestions.style.display = "none";
       renderCards(spreadsheetData);
       return;
     }
-    const filtered = spreadsheetData.filter(app =>
-      (app.name && app.name.toLowerCase().includes(query)) ||
-      (app.description && app.description.toLowerCase().includes(query))
-    );
+
+    // Filter local data for immediate response
+    const filtered = spreadsheetData.filter(app => {
+      const name = (app.name || '').toLowerCase();
+      const link = (app.link || '').toLowerCase();
+      const id = (app.id || '').toLowerCase();
+      
+      return name.includes(query) || 
+             link.includes(query) || 
+             id.includes(query);
+    });
+
+    // Show filtered cards immediately
     renderCards(filtered);
+
+    // Only recommend card titles (name) that match the query
+    const recommendations = spreadsheetData
+      .filter(app => (app.name || '').toLowerCase().includes(query))
+      .map(app => ({
+        text: app.name,
+        data: app
+      }))
+      // Remove duplicates by name
+      .filter((item, index, self) =>
+        index === self.findIndex(t => t.text === item.text)
+      )
+      .slice(0, 5);
+
+    if (recommendations.length > 0) {
+      suggestions.innerHTML = recommendations
+        .map(rec => `
+          <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" 
+              style="cursor: pointer; border-bottom: 1px solid #e9ecef;" 
+              data-name="${rec.data.name}">
+            <div>
+              <div class="fw-medium" style="font-size: 0.95rem;">${rec.text}</div>
+            </div>
+          </li>
+        `).join("");
+      suggestions.style.display = "block";
+    } else {
+      suggestions.innerHTML = `
+        <li class="list-group-item text-muted text-center" style="font-style: italic;">
+          No recommendations found
+        </li>
+      `;
+      suggestions.style.display = "block";
+    }
+  });
+
+  // Handle recommendation clicks
+  document.getElementById("hubSearchSuggestions").addEventListener("click", function (e) {
+    const listItem = e.target.closest("li.list-group-item-action");
+    if (listItem) {
+      const name = listItem.getAttribute("data-name");
+      
+      // Find the specific app
+      const selectedApp = spreadsheetData.find(app => app.name === name);
+      
+      if (selectedApp) {
+        // Update search input based on selection type
+        const searchInput = document.getElementById("hubSearchInput");
+        searchInput.value = selectedApp.name || '';
+        
+        // Show only the selected card
+        renderCards([selectedApp]);
+        
+        // Hide suggestions
+        document.getElementById("hubSearchSuggestions").style.display = "none";
+        
+        // Optional: Show success notification
+        showHubNotification(`Found: ${selectedApp.name}`, "#28a745");
+      }
+    }
+  });
+
+  // Hide suggestions when clicking outside or losing focus
+  document.getElementById("hubSearchInput").addEventListener("blur", function () {
+    setTimeout(() => {
+      document.getElementById("hubSearchSuggestions").style.display = "none";
+    }, 200); // Delay to allow click on suggestions
+  });
+
+  document.getElementById("hubSearchInput").addEventListener("focus", function () {
+    const suggestions = document.getElementById("hubSearchSuggestions");
+    if (suggestions.innerHTML.trim() !== "" && this.value.trim() !== "") {
+      suggestions.style.display = "block";
+    }
+  });
+
+  // Handle Enter key for exact search
+  document.getElementById("hubSearchInput").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const query = this.value.trim().toLowerCase();
+      
+      if (!query) {
+        renderCards(spreadsheetData);
+        return;
+      }
+
+      // Find exact matches first, then partial matches
+      const exactMatches = spreadsheetData.filter(app => {
+        const name = (app.name || '').toLowerCase();
+        const link = (app.link || '').toLowerCase();
+        const id = (app.id || '').toLowerCase();
+        
+        return name === query || link === query || id === query;
+      });
+
+      const partialMatches = spreadsheetData.filter(app => {
+        const name = (app.name || '').toLowerCase();
+        const link = (app.link || '').toLowerCase();
+        const description = (app.description || '').toLowerCase();
+        const id = (app.id || '').toLowerCase();
+        
+        return (name.includes(query) || 
+                link.includes(query) || 
+                description.includes(query) || 
+                id.includes(query)) && 
+               !exactMatches.includes(app);
+      });
+
+      const results = [...exactMatches, ...partialMatches];
+      
+      if (results.length > 0) {
+        renderCards(results);
+        showHubNotification(`Found ${results.length} result(s)`, "#28a745");
+      } else {
+        renderCards([]);
+        const container = document.querySelector(".card-container");
+        container.innerHTML = `
+          <div class="col-12">
+            <div class="alert alert-warning text-center" role="alert">
+              <i class="bi bi-search"></i>
+              <h5 class="mt-2">No results found</h5>
+              <p class="mb-0">No web apps match your search criteria: "${this.value}"</p>
+            </div>
+          </div>
+        `;
+        showHubNotification("No results found", "#ffc107");
+      }
+      
+      document.getElementById("hubSearchSuggestions").style.display = "none";
+    }
   });
 </script>

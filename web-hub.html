@@ -1186,32 +1186,6 @@
     }
   });
 
-  // Handle recommendation clicks
-  document.getElementById("hubSearchSuggestions").addEventListener("click", function (e) {
-    const listItem = e.target.closest("li.list-group-item-action");
-    if (listItem) {
-      const name = listItem.getAttribute("data-name");
-      
-      // Find the specific app
-      const selectedApp = spreadsheetData.find(app => app.name === name);
-      
-      if (selectedApp) {
-        // Update search input based on selection type
-        const searchInput = document.getElementById("hubSearchInput");
-        searchInput.value = selectedApp.name || '';
-        
-        // Show only the selected card
-        renderCards([selectedApp]);
-        
-        // Hide suggestions
-        document.getElementById("hubSearchSuggestions").style.display = "none";
-        
-        // Optional: Show success notification
-        showHubNotification(`Found: ${selectedApp.name}`, "#28a745");
-      }
-    }
-  });
-
   // Hide suggestions when clicking outside or losing focus
   document.getElementById("hubSearchInput").addEventListener("blur", function () {
     setTimeout(() => {

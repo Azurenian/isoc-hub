@@ -920,6 +920,7 @@
         google.script.run
           .withSuccessHandler(function(filteredData) {
             if (filteredData && filteredData.length > 0) {
+              console.log("Filtered cards for recommendation:", filteredData);
               renderCards(filteredData);
               showHubNotification(`Found ${filteredData.length} result(s)`, "#28a745");
             } else {
@@ -1289,7 +1290,7 @@
       const name = listItem.getAttribute("data-name");
       // Filter cards by exact name match (case-insensitive)
       const filtered = spreadsheetData.filter(app =>
-        (app.name || '').toLowerCase() === name.toLowerCase()
+        (app.name || '').toLowerCase().includes(name.toLowerCase())
       );
       renderCards(filtered);
       // Optionally, set the search input to the clicked name

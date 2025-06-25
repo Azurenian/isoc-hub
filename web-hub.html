@@ -807,7 +807,7 @@
               .filter((item, index, self) => 
                 index === self.findIndex(t => t.name === item.name)
               )
-              .slice(0, 5);
+              .slice(0, 3);
 
             cleanSuggestions.innerHTML = uniqueSuggestions
               .map(rec => `
@@ -1281,4 +1281,21 @@
     .addEventListener("click", function () {
       showHubNotification("This is a test notification! 🔔", "#6f42c1");
     });
+
+  // Make recommendations clickable
+  document.getElementById("hubSearchSuggestions").addEventListener("click", function (e) {
+    const listItem = e.target.closest("li.list-group-item-action");
+    if (listItem) {
+      const name = listItem.getAttribute("data-name");
+      // Filter cards by exact name match (case-insensitive)
+      const filtered = spreadsheetData.filter(app =>
+        (app.name || '').toLowerCase() === name.toLowerCase()
+      );
+      renderCards(filtered);
+      // Optionally, set the search input to the clicked name
+      document.getElementById("hubSearchInput").value = name;
+      // Hide the suggestions
+      this.style.display = "none";
+    }
+  });
 </script>

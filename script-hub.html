@@ -104,21 +104,6 @@
     const searchInput = document.getElementById("hubSearchInput");
     const suggestions = document.getElementById("hubSearchSuggestions");
 
-    // Show recommendations as you type
-    searchInput.addEventListener("input", function () {
-      suggestions.style.display = "none"; // Hide recommendations immediately
-
-      const query = this.value.trim().toLowerCase();
-      // Filter cards as you type
-      if (!query) {
-        renderCards(spreadsheetData);
-        return;
-      }
-      const filtered = spreadsheetData.filter(app =>
-        app.name && app.name.toLowerCase().includes(query)
-      );
-      renderCards(filtered);
-    });
 
     // When a recommendation is clicked, fill input and show only that card
     suggestions.addEventListener("click", function (e) {

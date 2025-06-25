@@ -1282,19 +1282,4 @@
       document.getElementById("hubSearchSuggestions").style.display = "none";
     }
   });
-
-  searchInput.addEventListener("input", function () {
-    suggestions.style.display = "none"; // Hide recommendations immediately
-
-    const query = this.value.trim().toLowerCase();
-    // Filter cards as you type
-    if (!query) {
-      renderCards(spreadsheetData);
-      return;
-    }
-    const filtered = spreadsheetData.filter(app =>
-      app.name && app.name.toLowerCase().includes(query)
-    );
-    renderCards(filtered);
-  });
 </script>

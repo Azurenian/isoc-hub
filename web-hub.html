@@ -1290,7 +1290,7 @@
       const name = listItem.getAttribute("data-name");
       // Filter cards by exact name match (case-insensitive)
       const filtered = spreadsheetData.filter(app =>
-        (app.name || '').toLowerCase() === name.toLowerCase()
+        (app.name || '').toLowerCase().includes(name.toLowerCase())
       );
       renderCards(filtered);
       // Set the search input to the clicked name

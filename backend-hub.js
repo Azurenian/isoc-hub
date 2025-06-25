@@ -247,3 +247,190 @@ function filterAppsBySearch(query) {
     return [];
   }
 }
+
+// ========== OJT PROJECT FUNCTIONS ==========
+
+// Add a new OJT project entry to the Hublist-OJT sheet
+function addOjtProjectToSheet(name, link, description) {
+  var ss = SpreadsheetApp.openById(
+    "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
+  );
+  var sheet = ss.getSheetByName("Hublist-OJT");
+  if (!sheet) {
+    // Create the sheet if it doesn't exist
+    sheet = ss.insertSheet("Hublist-OJT");
+    sheet.getRange(1, 1, 1, 4).setValues([["Name", "Link", "Description", "ID"]]);
+  }
+  sheet.appendRow([name, link, description, ""]);
+  return {
+    name: name,
+    link: link,
+    description: description,
+  };
+}
+
+// Get all OJT project entries from the Hublist-OJT sheet
+function getOjtProjectsFromSheet() {
+  var ss = SpreadsheetApp.openById(
+    "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
+  );
+  var sheet = ss.getSheetByName("Hublist-OJT");
+  if (!sheet) {
+    return [];
+  }
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return [];
+
+  var data = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
+  return data.map(function (row) {
+    return {
+      name: row[0] || '',
+      link: row[1] || '',
+      description: row[2] || '',
+      id: row[3] || ''
+    };
+  });
+}
+
+// Delete an OJT project entry from the Hublist-OJT sheet
+function deleteOjtProjectFromSheet(index) {
+  var ss = SpreadsheetApp.openById(
+    "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
+  );
+  var sheet = ss.getSheetByName("Hublist-OJT");
+  if (!sheet) return;
+  sheet.deleteRow(Number(index) + 2);
+}
+
+// Edit an OJT project entry in the Hublist-OJT sheet
+function editOjtProjectInSheet(index, name, link, description) {
+  var ss = SpreadsheetApp.openById(
+    "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
+  );
+  var sheet = ss.getSheetByName("Hublist-OJT");
+  if (!sheet) return;
+  var row = Number(index) + 2;
+  sheet.getRange(row, 1).setValue(name);
+  sheet.getRange(row, 2).setValue(link);
+  sheet.getRange(row, 3).setValue(description);
+}
+
+// Get search suggestions for OJT projects
+function getOjtSearchSuggestions(query) {
+  try {
+    var ss = SpreadsheetApp.openById(
+      "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
+    );
+    var sheet = ss.getSheetByName("Hublist-OJT");
+    if (!sheet) return [];
+    
+    var lastRow = sheet.getLastRow();
+    if (lastRow < 2) return [];
+
+    var data = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
+    var suggestions = [];
+    
+    query = String(query).toLowerCase();
+    
+    for (var i = 0; i < data.length; i++) {
+      var row = data[i];
+      var name = String(row[0] || '').toLowerCase();
+      var link = String(row[1] || '').toLowerCase();
+      var id = String(row[3] || '').toLowerCase();
+      
+      if (name.includes(query) || link.includes(query) || id.includes(query)) {
+        suggestions.push({
+          name: row[0] || '',
+          link: row[1] || '',
+          description: row[2] || '',
+          id: row[3] || '',
+          matchType: id.includes(query) ? 'id' : 
+                    link.includes(query) ? 'link' : 'name'
+        });
+      }
+    }
+    
+    return suggestions;
+    
+  } catch (error) {
+    console.error("Error in getOjtSearchSuggestions:", error.toString());
+    return [];
+  }
+}
+
+// Filter OJT projects by search query
+function filterOjtProjectsBySearch(query) {
+  try {
+    var ss = SpreadsheetApp.openById(
+      "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
+    );
+    var sheet = ss.getSheetByName("Hublist-OJT");
+    if (!sheet) return [];
+    
+    var lastRow = sheet.getLastRow();
+    if (lastRow < 2) return [];
+
+    var data = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
+    var results = [];
+    
+    query = String(query).toLowerCase();
+    
+    for (var i = 0; i < data.length; i++) {
+      var row = data[i];
+      var name = String(row[0] || '').toLowerCase();
+      var link = String(row[1] || '').toLowerCase();
+      var description = String(row[2] || '').toLowerCase();
+      var id = String(row[3] || '').toLowerCase();
+      
+      if (name.includes(query) || link.includes(query) || description.includes(query) || id.includes(query)) {
+        results.push({
+          name: row[0] || '',
+          link: row[1] || '',
+          description: row[2] || '',
+          id: row[3] || ''
+        });
+      }
+    }
+    
+    return results;
+    
+  } catch (error) {
+    console.error("Error in filterOjtProjectsBySearch:", error.toString());
+    return [];
+  }
+}
+
+// Add comment to OJT project (using OJT-Comments sheet)
+function addOjtCommentToSheet(name, comment, cardId) {
+  var ss = SpreadsheetApp.openById(
+    "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
+  );
+  var sheet = ss.getSheetByName("OJT-Comments");
+  if (!sheet) {
+    sheet = ss.insertSheet("OJT-Comments");
+    sheet.getRange(1, 1, 1, 4).setValues([["Name", "Comment", "Card ID", "Date"]]);
+  }
+  var date = new Date().toLocaleString();
+  sheet.appendRow([name, comment, cardId, date]);
+}
+
+// Get comments for OJT project card
+function getOjtCommentsForCard(cardId) {
+  var ss = SpreadsheetApp.openById(
+    "1kDFS1VMKfhqRUiasKxEF5qp9sTPEAgiXmdL_q6RGWqo"
+  );
+  var sheet = ss.getSheetByName("OJT-Comments");
+  if (!sheet) return [];
+  var data = sheet.getDataRange().getValues();
+  var comments = [];
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][2]) === String(cardId)) {
+      comments.push({ 
+        name: data[i][0], 
+        comment: data[i][1],
+        date: data[i][3] || ''
+      });
+    }
+  }
+  return comments;
+}

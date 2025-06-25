@@ -32,6 +32,7 @@
     <?!= include('style-main'); ?>
     <?!= include('style-sidebar'); ?>
     <?!= include('style-hub'); ?>
+    <?!= include('style-hub-ojt'); ?>
     <?!= include('style-settings'); ?>
   </head>
   <body>
@@ -41,6 +42,7 @@
     <!-- Main Content Area -->
     <div class="main-content">
       <?!= include('web-hub'); ?>
+      <?!= include('web-hub-ojt'); ?>
       <?!= include('web-settings'); ?>
     </div>
 
@@ -53,6 +55,7 @@
     <!-- Custom scripts -->
     <?!= include('script-sidebar'); ?>
     <?!= include('script-hub'); ?>
+    <?!= include('script-hub-ojt'); ?>
     <?!= include('script-settings'); ?>
     <script>
       // Example data source
@@ -158,7 +161,7 @@
       });
 
       // Add/Edit Modal logic
-      const appModal = new bootstrap.Modal(document.getElementById('appModal'));
+      // appModal is already declared and initialized above
       const appForm = document.getElementById('appForm');
       let isEditMode = false;
       let editIndex = null;

@@ -1282,36 +1282,4 @@
       document.getElementById("hubSearchSuggestions").style.display = "none";
     }
   });
-
-  searchInput.addEventListener("input", function () {
-  const query = this.value.trim().toLowerCase();
-  if (!query) {
-    suggestions.style.display = "none";
-    renderCards(spreadsheetData);
-    return;
-  }
-  // Recommend only card titles (name) that match the query
-  const matches = spreadsheetData
-    .filter(app => app.name && app.name.toLowerCase().includes(query))
-    .map(app => app.name);
-
-  if (matches.length > 0) {
-    suggestions.innerHTML = matches
-      .map(
-        title =>
-          `<li class="list-group-item list-group-item-action" style="cursor:pointer;">${title}</li>`
-      )
-      .join("");
-    suggestions.style.display = "block";
-  } else {
-    suggestions.innerHTML = `<li class="list-group-item text-muted">No recommendations</li>`;
-    suggestions.style.display = "block";
-  }
-
-  // Filter cards as you type
-  const filtered = spreadsheetData.filter(app =>
-    app.name && app.name.toLowerCase().includes(query)
-  );
-  renderCards(filtered);
-});
 </script>
